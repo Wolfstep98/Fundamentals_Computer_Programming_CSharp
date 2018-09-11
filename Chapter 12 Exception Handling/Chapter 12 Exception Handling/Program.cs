@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.IO;
+using System.Net;
 
 namespace Chapter_12_Exception_Handling
 {
@@ -14,7 +12,10 @@ namespace Chapter_12_Exception_Handling
             //Exo7.Execute();
             //Exo8.Execute();
             //Exo9.Execute();
-            Exo10.Execute();
+            //Exo10.Execute();
+            //Exo11.Execute();
+            //Exo12.Execute();
+            Exo13.Execute();
         }
     }
 
@@ -209,5 +210,107 @@ namespace Chapter_12_Exception_Handling
         protected FileParseException(
           System.Runtime.Serialization.SerializationInfo info,
           System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+    }
+
+    static class Exo11
+    {
+        public static void Execute()
+        {
+            ReadIntegersFromFile("C:/Users/Wolfstep/Documents/PROG/C#/Chapter12Exo9.txt");
+        }
+
+        public static void ReadIntegersFromFile(string path)
+        {
+            StreamReader reader = new StreamReader(path);
+            string line = "";
+            reader.BaseStream.Seek(0, SeekOrigin.Begin);
+            while (!reader.EndOfStream)
+            {
+                line = reader.ReadLine();
+                int result;
+                if(int.TryParse(line,out result))
+                {
+
+                }
+                else
+                {
+                    throw new FileParseException("The row does not contain in integer", path.Substring(path.LastIndexOf('/'), path.Length - path.LastIndexOf('/')), (int)reader.BaseStream.Seek(0, SeekOrigin.Current));
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write a program that gets from the user the full path to a file (for example C:\Windows\win.ini), reads the content of the file and prints it to the console. 
+    /// Find in MSDN how to us the System.IO.File. ReadAllText(…) method. 
+    /// Make sure all possible exceptions will be caught and a user-friendly message will be printed on the console.
+    /// </summary>
+    static class Exo12
+    {
+        public static void Execute()
+        {
+            Console.WriteLine("Write the full path of a file !");
+            string path = Console.ReadLine();
+
+            try
+            {
+                string text = File.ReadAllText(path);
+                Console.WriteLine(text);
+            }
+            catch(ArgumentException e)
+            {
+                Console.WriteLine(e.Message);
+                Console.WriteLine("Veuillez rentrer le chemin d'acces vers le fichier.");
+            }
+            catch (PathTooLongException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (DirectoryNotFoundException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                Console.WriteLine("You don't have access to this file.");
+                Console.WriteLine(e.Message);
+            }
+            catch (IOException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (NotSupportedException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (System.Security.SecurityException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
+    }
+
+    static class Exo13
+    {
+        public static void Execute()
+        {
+            WebClient client = new WebClient();
+            try
+            {
+                client.DownloadFile("https://www.economie.gouv.fr/files/styles/articles_vous_orienter/public/billets_avion_910.jpg?itok=6C1JrsLi", "C:/Users/Wolfstep/Documents/PROG/C#/FileDownloaded.png");
+            }
+            catch(ArgumentException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (WebException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+            catch (NotSupportedException e)
+            {
+                Console.WriteLine(e.Message);
+            }
+        }
     }
 }
