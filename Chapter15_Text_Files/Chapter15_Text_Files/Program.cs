@@ -8,7 +8,7 @@ namespace Chapter15_Text_Files
     {
         static void Main(string[] args)
         {
-            Exo6.Execute();
+            Exo10.Execute();
         }
     }
 
@@ -213,4 +213,168 @@ namespace Chapter15_Text_Files
             return string.Compare(a,b);
         }
     }
+
+    /// <summary>
+    /// Write a program that replaces every occurrence of the substring "start" with "finish" in a text file. 
+    /// Can you rewrite the program to replace whole words only? 
+    /// Does the program work for large files (e.g. 800 MB)?
+    /// </summary>
+    public static class Exo7
+    {
+        public static string token = " start ";
+        public static string newToken = " finish ";
+
+        public static void Execute()
+        {
+            StreamReader reader = new StreamReader("FileExo7.txt");
+            StreamWriter writer = new StreamWriter("FileExo7Fixed.txt");
+
+            string line = null;
+            using (reader)
+            {
+                using (writer)
+                {
+                    line = reader.ReadLine();
+                    while(line != null)
+                    {
+                        writer.WriteLine(FixToken(line));
+                        line = reader.ReadLine();
+                    }
+                }
+            }
+        }
+
+        public static string FixToken(string line)
+        {
+            return line.Replace(token, newToken);
+        }
+    }
+
+    /// <summary>
+    /// Write the previous program so that it changes only the whole words (not parts of the word).
+    /// </summary>
+    public static class Exo8
+    {
+        public static void Execute()
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// Write a program that deletes all the odd lines of a text file.
+    /// </summary>
+    public static class Exo9
+    {
+        public static void Execute()
+        {
+            StreamReader reader = new StreamReader("FileExo9.txt");
+            StreamWriter writer = new StreamWriter("FileExo9WithoutOdd.txt");
+            using (reader)
+            {
+                using (writer)
+                {
+                    string line = reader.ReadLine();
+                    while (line != null)
+                    {
+                        writer.WriteLine(line);
+                        line = reader.ReadLine();
+                        line = reader.ReadLine();
+                    }
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write a program that extracts from an XML file the text only (without the tags).
+    /// </summary>
+    public static class Exo10
+    {
+        public static void Execute()
+        {
+            List<string> words = new List<string>();
+            StreamReader reader = new StreamReader("FileExo10.xml");
+            int depth = 0;
+            using (reader)
+            {
+                string line = reader.ReadLine();
+                string word = "";
+                while(line != null)
+                {
+                    for(int i = 0; i < line.Length;i++)
+                    {
+                        if(depth == 0)
+                        {
+                            if (line[i] == '<')
+                            {
+                                if(word != "")
+                                {
+                                    words.Add(word);
+                                }
+                                depth++;
+                                continue;
+                            }
+                            else if(line[i] != ' ' && line[i] != '\n' && line[i] != '\r')
+                            {
+                                word += line[i];
+                            }
+                        }
+                        else
+                        {
+                            if (line[i] == '>')
+                            {
+                                depth--;
+                                word = "";
+                            }
+                        }
+                    }
+                    line = reader.ReadLine();
+                }
+            }
+
+            for(int i = 0; i < words.Count;i++)
+            {
+                Console.WriteLine(words[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write a program that deletes all words that begin with the word "test". 
+    /// The words will contain only the following chars: 0…9, a…z, A…Z.
+    /// </summary>
+    public static class Exo11
+    {
+        public static void Execute()
+        {
+
+        }
+    } //TODO
+
+    /// <summary>
+    /// A text file words.txt is given, containing a list of words, one per line. 
+    /// Write a program that deletes in the file text.txt all the words that occur in the other file. 
+    /// Catch and handle all possible exceptions.
+    /// </summary>
+    public static class Exo12
+    {
+        public static void Execute()
+        {
+
+        }
+    } //TODO
+
+    /// <summary>
+    /// Write a program that reads a list of words from a file called words.txt, counts how many times each of these words is found in another file text.txt, and records the results in a third file – result.txt, 
+    /// but before that, sorts them by the number of occurrences in descending order. 
+    /// Handle all possible exceptions.
+    /// </summary>
+    public static class Exo13
+    {
+        public static void Execute()
+        {
+
+        }
+    } //TODO
 }
