@@ -13,7 +13,26 @@ namespace Chapter_16_Linear_Data_Structures
             //Exo3.Execute();
             //Exo4.Execute();
             //Exo5.Execute();
-            Exo6.Execute();
+            //Exo6.Execute();
+            //Exo7.Execute();
+            Exo8.Execute();
+        }
+
+        public static void PrintIntegerArray(int[] tab)
+        {
+            Console.WriteLine("Tab :");
+
+            for (int i = 0; i < tab.Length; i++)
+            {
+                Console.Write(" " + tab[i] + " |");
+            }
+
+            Console.WriteLine();
+        }
+
+        public static void PrintIntegerArray(List<int> tab)
+        {
+            PrintIntegerArray(tab.ToArray());
         }
     }
 
@@ -234,9 +253,67 @@ namespace Chapter_16_Linear_Data_Structures
     /// </summary>
     public static class Exo6
     {
-        public static void Execute()
-        { 
+        static int minNumber = 0;
+        static int maxNumber = 20;
 
+        public static void Execute()
+        {
+            long firstTick = DateTime.Now.Ticks;
+
+            Random random = new Random();
+            int[] sequence = new int[50];
+
+            Console.WriteLine("First tab :");
+            for(int i = 0; i < sequence.Length;i++)
+            {
+                sequence[i] = random.Next(minNumber, maxNumber);
+                Console.Write(" " + sequence[i] + " |");
+            }
+
+            Console.WriteLine();
+
+            Dictionary<int, int> numberAppeared = new Dictionary<int, int>(maxNumber);
+
+            for(int i = 0; i < sequence.Length;i++)
+            {
+                if(numberAppeared.ContainsKey(sequence[i]))
+                {
+                    numberAppeared[sequence[i]]++;
+                }
+                else
+                {
+                    numberAppeared.Add(sequence[i], 1);
+                }
+            }
+
+            List<int> evenNumbers = new List<int>();
+            for(int i = 0; i < sequence.Length;i++)
+            {
+                if(numberAppeared[sequence[i]] % 2 == 0)
+                {
+                    evenNumbers.Add(sequence[i]);
+                }
+            }
+
+            Console.WriteLine("Final tab :");
+            for (int i = 0; i < evenNumbers.Count;i++)
+            {
+                Console.Write(" " + evenNumbers[i] + " |");
+            }
+
+            Console.WriteLine();
+
+            Dictionary<int, int>.KeyCollection keys = numberAppeared.Keys;
+            foreach(int key in keys)
+            {
+                Console.WriteLine("The number " + key + " appears " + numberAppeared[key] + " time(s) !");
+            }
+
+            long lastTick = DateTime.Now.Ticks;
+
+            float time = (lastTick - firstTick) / 1000000.0f;
+
+            Console.WriteLine("The operation lasted : " + time + " sec");
         }
     }
 
@@ -247,7 +324,36 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
+            Random random = new Random();
+            int[] sequence = new int[50];
+            for(int i = 0; i < sequence.Length;i++)
+            {
+                sequence[i] = random.Next(0, 1001);
+            }
 
+            Console.WriteLine("First tab :");
+            for (int i = 0; i < sequence.Length; i++)
+            {
+                Console.Write(" " + sequence[i] + " |");
+            }
+
+            Console.WriteLine();
+
+            int[] numbersAppearance = new int[1001];
+            for(int i = 0; i < sequence.Length;i++)
+            {
+                numbersAppearance[sequence[i]]++;
+            }
+
+            for (int i = 0; i < numbersAppearance.Length; i++)
+            {
+                if (numbersAppearance[i] != 0)
+                {
+                    Console.WriteLine("The number " + i  + " appears " + numbersAppearance[i] + " time(s)");
+                }
+            }
+
+            Console.WriteLine();
         }
     }
 
@@ -258,9 +364,62 @@ namespace Chapter_16_Linear_Data_Structures
     /// </summary>
     public static class Exo8
     {
+        static int N = 20;
+
         public static void Execute()
         {
+            Random random = new Random();
+            List<int> sequence = new List<int>(N);
+            for(int i = 0; i < sequence.Capacity;i++)
+            {
+                sequence.Add(random.Next(0, 2));
+            }
 
+            Program.PrintIntegerArray(sequence);
+
+            sequence.Sort();
+
+            Program.PrintIntegerArray(sequence);
+
+            int currentNumber = -1;
+            int numberAppearance = 0;
+            for(int i = 0; i < sequence.Count;i++)
+            {
+                if(i >= (N/2))
+                {
+                    if(currentNumber != sequence[i])
+                    {
+                        Console.WriteLine("The majorant does not exist!");
+                        break;
+                    }
+                    else
+                    {
+                        numberAppearance++;
+                        if(numberAppearance >= (N / 2 + 1))
+                        {
+                            Console.WriteLine("The majorant is " + currentNumber);
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    if(currentNumber != sequence[i])
+                    {
+                        currentNumber = sequence[i];
+                        numberAppearance = 1;
+                    }
+                    else
+                    {
+                        numberAppearance++;
+                        if (numberAppearance >= (N / 2 + 1))
+                        {
+                            Console.WriteLine("The majorant is " + currentNumber);
+                            break;
+                        }
+                    }
+                }
+            }
         }
     }
 
