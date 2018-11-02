@@ -15,7 +15,9 @@ namespace Chapter_16_Linear_Data_Structures
             //Exo5.Execute();
             //Exo6.Execute();
             //Exo7.Execute();
-            Exo8.Execute();
+            //Exo8.Execute();
+            //Exo9.Execute();
+            Exo10.Execute();
         }
 
         public static void PrintIntegerArray(int[] tab)
@@ -438,7 +440,21 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
-
+            Queue<int> suite = new Queue<int>();
+            Console.Write("Write N : ");
+            int N = int.Parse(Console.ReadLine());
+            Console.Write(N + " => ");
+            suite.Enqueue(N);
+            for (int i = 0; i < 50; i++)
+            {
+                suite.Enqueue(suite.Peek() + 1);
+                suite.Enqueue(2 * suite.Peek() + 1);
+                suite.Enqueue(suite.Peek() + 2);
+                if(i == 49)
+                    Console.Write(suite.Dequeue() + "\n");
+                else
+                    Console.Write(suite.Dequeue() + ", ");
+            }
         }
     }
 
@@ -454,11 +470,54 @@ namespace Chapter_16_Linear_Data_Structures
     /// </summary>
     public static class Exo10
     {
+        static int N = 0;
+        static int M = 0;
         public static void Execute()
         {
+            Queue<int> suite = new Queue<int>();
+            Console.Write("Write N : ");
+            N = int.Parse(Console.ReadLine());
+            Console.Write("Write M : ");
+            M = int.Parse(Console.ReadLine());
+
+            suite.Enqueue(N);
+
+            //FindSubsequence(suite);
+
+            Console.Write(N + " => ");
+            for (int i = 0; i < suite.Count; i++)
+            {
+                 Console.Write(suite.Dequeue() + " => ");
+            }
+            Console.WriteLine(M);
 
         }
-    }
+
+        //public static void FindSubsequence(Queue<int> suite)
+        //{
+        //    int number = suite.Dequeue();
+
+        //    int multipleTwo = number * 2;
+        //    int plusTwo = number + 2;
+        //    int plusOne = number + 1;
+
+        //    if (multipleTwo <= M)
+        //    {
+        //        suite.Enqueue(multipleTwo);
+        //        FindSubsequence(suite);
+        //    }
+        //    if (plusTwo <= M)
+        //    {
+        //        suite.Enqueue(plusTwo);
+        //        FindSubsequence(suite);
+        //    }
+        //    if (plusOne <= M)
+        //    {
+        //        suite.Enqueue(plusOne);
+        //        FindSubsequence(suite);
+        //    }
+        //}
+    } //TODO
 
     /// <summary>
     /// Implement the data structure dynamic doubly linked list (DoublyLinkedList<T>) – list, the elements of which have pointers both to the next and the previous elements. 
