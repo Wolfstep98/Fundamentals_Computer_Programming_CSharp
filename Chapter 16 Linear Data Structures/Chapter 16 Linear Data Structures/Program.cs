@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -521,13 +522,190 @@ namespace Chapter_16_Linear_Data_Structures
 
     /// <summary>
     /// Implement the data structure dynamic doubly linked list (DoublyLinkedList<T>) – list, the elements of which have pointers both to the next and the previous elements. 
-    /// Implement the operations for adding, removing and searching for an element, as well as inserting an element at a given index, retrieving an element by a given index and a method, which returns an array with the elements of the list.
+    /// Implement the operations for adding(OK), removing and searching for an element, as well as inserting an element at a given index, retrieving an element by a given index and a method, which returns an array with the elements of the list.
     /// </summary>
     public static class Exo11
     {
         public static void Execute()
         {
+            
+        }
 
+        public class DoublyLinkedList<T> : ICollection<T>, IEnumerable<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, IEnumerable//, ICollection, IList
+        {
+            #region Classes
+            private class DoublyLinkedNode
+            {
+                #region Fields
+                private T m_value = default(T);
+                private DoublyLinkedNode m_previousNode = null;
+                private DoublyLinkedNode m_nextNode = null;
+                #endregion
+
+                #region Constructor
+                public DoublyLinkedNode(T value = default(T), DoublyLinkedNode previousNode = null, DoublyLinkedNode nextNode = null)
+                {
+                    this.m_value = value;
+                    this.m_previousNode = previousNode;
+                    this.m_nextNode = nextNode;
+                }
+                #endregion
+
+                #region Properties
+                public T Value { get { return this.m_value; } set { this.m_value = value; } }
+                public DoublyLinkedNode PreviousNode { get { return this.m_previousNode; } set { this.m_previousNode = value; } }
+                public DoublyLinkedNode NextNode { get { return this.m_nextNode; } set { this.m_nextNode = value; } }
+                #endregion
+            }
+            #endregion
+
+            #region Fields
+            private bool isReadOnly = false;
+
+            private int count = 0;
+
+            private DoublyLinkedNode head = null;
+            private DoublyLinkedNode tail = null;
+            #endregion
+
+            #region Constructors
+            public DoublyLinkedList()
+            {
+                this.count = 0;
+                this.head = null;
+                this.tail = null;
+            }
+            #endregion
+
+            #region Properties
+
+            public T this[int index] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+            public int Count { get { return this.count; } }
+
+            public bool IsReadOnly { get { return this.isReadOnly; } }
+
+            #endregion
+            /// <summary>
+            /// Add an item at the end of the linked list.
+            /// </summary>
+            /// <param name="item">The element to add.</param>
+            public void Add(T item)
+            {
+                if(head == null)
+                {
+                    this.head = new DoublyLinkedNode(item,null,null);
+                    this.tail = this.head;
+                }
+                else
+                {
+                    DoublyLinkedNode previousNode = this.tail;
+                    this.tail = new DoublyLinkedNode(item, previousNode, null);
+                    previousNode.NextNode = this.tail;
+                }
+                this.count++;
+            }
+
+            public void Clear()
+            {
+                this.count = 0;
+                this.head = null;
+                this.tail = null;
+            }
+
+            public bool Contains(T item)
+            {
+                DoublyLinkedNode current = this.head;
+                while(current != null)
+                {
+                    if (object.Equals(item, current.Value))
+                        return true;
+                    current = current.NextNode;
+                }
+                return false;
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            public int IndexOf(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Insert(int index, T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public bool Remove(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void RemoveAt(int index)
+            {
+                if (index < 0 || index >= this.count)
+                    throw new IndexOutOfRangeException("Index out of range (0," + this.count + ") : " + index);
+                DoublyLinkedNode node = this.head;    
+                for(int i = 0; i < this.count; i++)
+                {
+                    if (i == index)
+                        break;
+                    node = node.NextNode;
+                }
+
+                this.RemoveNode(node);
+            }
+
+            private void RemoveNode(DoublyLinkedNode node)
+            {
+                this.count--;
+                if (this.count == 0)
+                {
+                    this.head = null;
+                    this.tail = null;
+                }
+                else if (node.PreviousNode == null)
+                {
+                    this.head = node.NextNode;
+                    this.head.PreviousNode = null;
+                }
+                else if (node.NextNode == null)
+                {
+                    this.tail = node.PreviousNode;
+                    this.tail.NextNode = null;
+                }
+                else
+                {
+                    node.PreviousNode.NextNode = node.NextNode;
+                    node.NextNode.PreviousNode = node.PreviousNode;
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            public T[] ToArray()
+            {
+                T[] array = new T[this.count];
+                DoublyLinkedNode node = this.head;
+                for(int i = 0; i < this.count;i++)
+                {
+                    array[i] = node.Value;
+                    node = node.NextNode;
+                }
+                return array;
+            }
         }
     }
 

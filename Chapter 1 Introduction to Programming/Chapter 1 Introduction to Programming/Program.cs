@@ -6,14 +6,14 @@ namespace Chapter_1_Introduction_to_Programming
     {
         static void Main(string[] args)
         {
-            Exo4.Execute();
-            Exo5.Execute();
-            Exo6.Execute();
-            Exo7.Execute();
-            Exo8.Execute();
-            Exo9.Execute();
-            Exo10.Execute();
-            Exo11.Execute();
+            Exo4.PrintHelloWorld();
+            Exo5.PrintGoodDay();
+            Exo6.PrintMyName();
+            Exo7.PrintNumbers();
+            Exo8.PrintCurrentDateAndTime();
+            Exo9.SqrtOf12345();
+            Exo10.PrintLoop();
+            Exo11.PrintAgeAndAgePlus10();
         }
     }
 
@@ -22,7 +22,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo4
     {
-        public static void Execute()
+        public static void PrintHelloWorld()
         {
             Console.WriteLine("Hello World !");
         }
@@ -33,7 +33,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo5
     {
-        public static void Execute()
+        public static void PrintGoodDay()
         {
             Console.WriteLine("Good Day!");
         }
@@ -44,7 +44,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo6
     {
-        public static void Execute()
+        public static void PrintMyName()
         {
             Console.WriteLine("Benjamin Peter");
         }
@@ -55,7 +55,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo7
     {
-        public static void Execute()
+        public static void PrintNumbers()
         {
             Console.WriteLine("1");
             Console.WriteLine("101");
@@ -68,7 +68,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo8
     {
-        public static void Execute()
+        public static void PrintCurrentDateAndTime()
         {
             Console.WriteLine(DateTime.Now);
         }
@@ -79,7 +79,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo9
     {
-        public static void Execute()
+        public static void SqrtOf12345()
         {
             Console.WriteLine(Math.Sqrt(12345));
         }
@@ -90,7 +90,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo10
     {
-        public static void Execute()
+        public static void PrintLoop()
         {
             for(int i = 2; i < 102;i++)
             {
@@ -104,7 +104,7 @@ namespace Chapter_1_Introduction_to_Programming
     /// </summary>
     public static class Exo11
     {
-        public static void Execute()
+        public static void PrintAgeAndAgePlus10()
         {
             Console.WriteLine("Write your age : ");
             int age = int.Parse(Console.ReadLine());
