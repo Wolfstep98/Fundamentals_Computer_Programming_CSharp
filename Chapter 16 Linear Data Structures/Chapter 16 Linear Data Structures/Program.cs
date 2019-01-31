@@ -522,7 +522,7 @@ namespace Chapter_16_Linear_Data_Structures
 
     /// <summary>
     /// Implement the data structure dynamic doubly linked list (DoublyLinkedList<T>) – list, the elements of which have pointers both to the next and the previous elements. 
-    /// Implement the operations for adding(OK), removing and searching for an element, as well as inserting an element at a given index, retrieving an element by a given index and a method, which returns an array with the elements of the list.
+    /// Implement the operations for adding(OK), removing(OK) and searching for an element(OK), as well as inserting an element at a given index(OK), retrieving an element by a given index(OK) and a method, which returns an array with the elements of the list(OK).
     /// </summary>
     public static class Exo11
     {
@@ -534,6 +534,7 @@ namespace Chapter_16_Linear_Data_Structures
         public class DoublyLinkedList<T> : ICollection<T>, IEnumerable<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, IEnumerable//, ICollection, IList
         {
             #region Classes
+            // --- Node ---
             private class DoublyLinkedNode
             {
                 #region Fields
@@ -557,12 +558,78 @@ namespace Chapter_16_Linear_Data_Structures
                 public DoublyLinkedNode NextNode { get { return this.m_nextNode; } set { this.m_nextNode = value; } }
                 #endregion
             }
+
+            // --- Enumerator ---
+            public class Enumerator : IEnumerator, IEnumerator<T>
+            {
+                #region Fields
+                private int version = 0;
+                private int index = 0;
+                private T current = default(T);
+                private DoublyLinkedNode currentNode = null;
+                private DoublyLinkedList<T> list = null;
+                #endregion
+
+                #region Constructors
+                public Enumerator(DoublyLinkedList<T> list)
+                {
+                    this.version = list.version;
+                    this.index = -1;
+                    this.current = default(T);
+                    this.currentNode = list.head;
+                    this.list = list;
+                }
+                #endregion
+
+                #region Properties
+                public T Current { get { return this.current; } }
+
+                object IEnumerator.Current => throw new NotImplementedException();
+                #endregion
+
+                #region Methods
+                public void Dispose()
+                {
+                    this.index = this.list.count + 1;
+                }
+
+                public bool MoveNext()
+                {
+                    if(this.version != this.list.version)
+                    {
+                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    }
+                    if(this.currentNode == null)
+                    {
+                        this.index = this.list.count + 1;
+                        return false;
+                    }
+                    this.index++;
+                    this.current = this.currentNode.Value;
+                    this.currentNode = this.currentNode.NextNode;
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    if (this.version != this.list.version)
+                    {
+                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    }
+                    this.index = -1;
+                    this.current = default(T);
+                    this.currentNode = null;
+                }
+                #endregion
+            }
+
             #endregion
 
             #region Fields
             private bool isReadOnly = false;
 
             private int count = 0;
+            private int version = 0;
 
             private DoublyLinkedNode head = null;
             private DoublyLinkedNode tail = null;
@@ -572,6 +639,7 @@ namespace Chapter_16_Linear_Data_Structures
             public DoublyLinkedList()
             {
                 this.count = 0;
+                this.version = 0;
                 this.head = null;
                 this.tail = null;
             }
@@ -586,6 +654,7 @@ namespace Chapter_16_Linear_Data_Structures
             public bool IsReadOnly { get { return this.isReadOnly; } }
 
             #endregion
+
             /// <summary>
             /// Add an item at the end of the linked list.
             /// </summary>
@@ -604,15 +673,68 @@ namespace Chapter_16_Linear_Data_Structures
                     previousNode.NextNode = this.tail;
                 }
                 this.count++;
+                this.version++;
             }
 
+            public void AddLast(T item)
+            {
+                if(this.head == null)
+                {
+                    this.head = new DoublyLinkedNode(item, null, null);
+                    this.tail = this.head;
+                }
+                else
+                {
+                    DoublyLinkedNode node = new DoublyLinkedNode(item, this.tail, null);
+                    this.tail.NextNode = node;
+                    this.tail = node;
+                }
+                this.count++;
+                this.version++;
+            }
+
+            public void AddBefore(T item)
+            {
+                if (this.head == null)
+                {
+                    this.head = new DoublyLinkedNode(item, null, null);
+                    this.tail = this.head;
+                }
+                else
+                {
+                    DoublyLinkedNode node = new DoublyLinkedNode(item, null, this.head);
+                    this.head.PreviousNode = node;
+                    this.head = node;
+                }
+                this.count++;
+                this.version++;
+            }
+
+            private void AddBeforeNode(T item, DoublyLinkedNode node)
+            {
+                DoublyLinkedNode newNode = new DoublyLinkedNode(item, node.PreviousNode, node);
+                node.PreviousNode.NextNode = newNode;
+                node.PreviousNode = newNode;
+                this.count++;
+                this.version++;
+            }
+
+            /// <summary>
+            /// Clear all the elements in the list.
+            /// </summary>
             public void Clear()
             {
                 this.count = 0;
+                this.version++;
                 this.head = null;
                 this.tail = null;
             }
 
+            /// <summary>
+            /// Check if the list contains this <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The elements that is researched.</param>
+            /// <returns>Is the elements in the list ?</returns>
             public bool Contains(T item)
             {
                 DoublyLinkedNode current = this.head;
@@ -625,31 +747,108 @@ namespace Chapter_16_Linear_Data_Structures
                 return false;
             }
 
+            /// <summary>
+            /// Copy a part of this list in another array starting from <paramref name="arrayIndex"/>.
+            /// </summary>
+            /// <param name="array">The array where the values will be copied.</param>
+            /// <param name="arrayIndex">The starting index of th ecopy.</param>
             public void CopyTo(T[] array, int arrayIndex)
             {
-                throw new NotImplementedException();
+                if(arrayIndex < 0 && arrayIndex >= this.count)
+                {
+                    throw new IndexOutOfRangeException("Index out of range (0," + this.count + ") : " + arrayIndex);
+                }
+
+                DoublyLinkedNode node = this.head;
+                for(int i = 0; i < arrayIndex;i++)
+                {
+                    node = node.NextNode;
+                }
+
+                for (int i = 0; i < this.count - arrayIndex; i++)
+                {
+                    array[i] = node.Value;
+                    node = node.NextNode;
+                }
             }
 
             public IEnumerator<T> GetEnumerator()
             {
-                throw new NotImplementedException();
+                return new Enumerator(this);
             }
 
+            /// <summary>
+            /// Check the index of an item in the list.
+            /// </summary>
+            /// <param name="item">The item we are searching for.</param>
+            /// <returns>The index of the item in the list. Return -1 if not found.</returns>
             public int IndexOf(T item)
             {
-                throw new NotImplementedException();
+                int index = -1;
+                DoublyLinkedNode node = this.head;
+                for(;index < this.count;)
+                {
+                    index++;
+                    if (object.Equals(item, node.Value))
+                    {
+                        return index;
+                    }
+                    node = node.NextNode;
+                }
+                return -1;
             }
 
+            #region Insertion
+            /// <summary>
+            /// Insert an <paramref name="item"/> at the <paramref name="index"/>.
+            /// </summary>
+            /// <param name="index">The index where we want to insert the item.</param>
+            /// <param name="item">The item to insert in the list.</param>
             public void Insert(int index, T item)
             {
-                throw new NotImplementedException();
-            }
+                if(index < 0 && index >= this.count)
+                {
+                    throw new IndexOutOfRangeException("Index out of range (0," + this.count + ") : " + index);
+                }
 
+                int currentIndex = 0;
+                DoublyLinkedNode node = this.head;
+                for (; currentIndex < this.count; currentIndex++) 
+                {
+                    if(currentIndex == index)
+                    {
+                        this.AddBeforeNode(item, node);
+                        return;
+                    }
+                    node = node.NextNode;
+                }
+            }
+            #endregion
+
+            /// <summary>
+            /// Remove an <paramref name="item"/> in the list.
+            /// </summary>
+            /// <param name="item">The item to remove.</param>
+            /// <returns>Has the item been removed.</returns>
             public bool Remove(T item)
             {
-                throw new NotImplementedException();
+                DoublyLinkedNode node = this.head;
+                while(node != null)
+                {
+                    if(object.Equals(item,node.Value))
+                    {
+                        this.RemoveNode(node);
+                        return true;
+                    }
+                    node = node.NextNode;
+                }
+                return false;
             }
 
+            /// <summary>
+            /// Remove an item at an <paramref name="index"/> in the list.
+            /// </summary>
+            /// <param name="index">The index of the item to remove.</param>
             public void RemoveAt(int index)
             {
                 if (index < 0 || index >= this.count)
@@ -665,9 +864,14 @@ namespace Chapter_16_Linear_Data_Structures
                 this.RemoveNode(node);
             }
 
+            /// <summary>
+            /// Remove a node and make connections correctly.
+            /// </summary>
+            /// <param name="node">The node to remove.</param>
             private void RemoveNode(DoublyLinkedNode node)
             {
                 this.count--;
+                this.version++;
                 if (this.count == 0)
                 {
                     this.head = null;
@@ -692,9 +896,13 @@ namespace Chapter_16_Linear_Data_Structures
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                throw new NotImplementedException();
+                return new Enumerator(this);
             }
 
+            /// <summary>
+            /// Return an array of the current list.
+            /// </summary>
+            /// <returns>Return an array of the current list values.</returns>
             public T[] ToArray()
             {
                 T[] array = new T[this.count];
@@ -719,6 +927,246 @@ namespace Chapter_16_Linear_Data_Structures
         {
 
         }
+
+        public interface IStack<T>
+        {
+            #region Properties
+            /// <summary>
+            /// Is the stack empty ?
+            /// </summary>
+            bool IsEmpty { get; }
+            /// <summary>
+            /// Number of elements in the stack.
+            /// </summary>
+            int Count { get; }
+            #endregion
+
+            #region Methods
+            void Push(T item);
+            T Pop();
+            T Peek();
+            void Clear();
+            #endregion
+        }
+
+        public class DynamicStack<T> : IStack<T> ,IEnumerable<T>, ICollection, IReadOnlyCollection<T>
+        {
+            #region Classes
+            // --- Node ---
+            private class StackNode
+            {
+                #region Fields
+                private T value;
+                private StackNode previousNode;
+                #endregion
+
+                #region Constructors
+                public StackNode(T value = default(T), StackNode previousNode = null)
+                {
+                    this.value = value;
+                    this.previousNode = previousNode;
+                }
+                #endregion
+
+                #region Properties
+                public T Value { get { return this.value; } set { this.value = value; } }
+                public StackNode PreviousNode { get { return this.previousNode; } set { this.previousNode = value; } }
+                #endregion
+            }
+
+            // --- Enumerator ---
+            public class Enumerator : IEnumerator<T>, IEnumerator
+            {
+                #region Fields
+                private int version;
+                private T current;
+                private StackNode currentNode;
+                private DynamicStack<T> stack;
+                #endregion
+
+                #region Constructors
+                public Enumerator(DynamicStack<T> stack)
+                {
+                    this.version = stack.version;
+                    this.current = default(T);
+                    this.currentNode = stack.head;
+                    this.stack = stack;
+                }
+                #endregion
+
+                #region Properties
+                public T Current
+                {
+                    get
+                    {
+                        if (this.version != stack.version)
+                            throw new InvalidOperationException("The enumerator version does not match the stack version !");
+                        if (this.currentNode == stack.head)
+                            throw new InvalidOperationException("Enumerator not yet moved, invoke MoveNext first");
+                        return this.current;
+                    }
+                }
+
+                object IEnumerator.Current { get { return this.Current; } }
+                #endregion
+
+                #region Methods
+                public void Dispose()
+                {
+                    this.current = default(T);
+                    this.currentNode = null;
+                }
+
+                public bool MoveNext()
+                {
+                    if (this.currentNode == null)
+                    {
+                        this.current = default(T);
+                        return false;
+                    }
+
+                    this.current = this.currentNode.Value;
+                    this.currentNode = this.currentNode.PreviousNode;
+
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    this.current = default(T);
+                    this.currentNode = this.stack.head;
+                }
+                #endregion
+            }
+
+            // --- Exceptions ---
+            public class StackEmptyException : ApplicationException
+            {
+                public StackEmptyException() : base()
+                {
+                    
+                }
+                public StackEmptyException(string message) : base(message)
+                {
+
+                }
+            }
+
+            public class StackUnderflowException : ApplicationException
+            {
+                public StackUnderflowException() : base()
+                {
+
+                }
+                public StackUnderflowException(string message) : base(message)
+                {
+
+                }
+            }
+            #endregion
+
+            #region Fields
+            private bool isEmpty = true;
+
+            private bool isSynchronized = false;
+            private Object syncRoot = null;
+
+            private int count = 0;
+            private int version = 0;
+            private int defaultCount = 8;
+
+            private StackNode head = null;
+            #endregion
+
+            #region Constructors
+            public DynamicStack()
+            {
+                this.isEmpty = true;
+                this.count = 0;
+                this.version = 0;
+                this.head = null;
+            }
+            public DynamicStack(int capacity)
+            {
+                this.isEmpty = true;
+                this.count = 0;
+                this.version = 0;
+                this.head = null;
+            }
+            #endregion
+
+            #region Properties
+            public bool IsEmpty { get { return this.isEmpty; } }
+
+            public int Count { get { return this.count; } }
+
+            public bool IsSynchronized { get { return this.isSynchronized; } }
+
+            public object SyncRoot { get { return this.syncRoot; } }
+            #endregion
+
+            #region Methods
+
+            public void Clear()
+            {
+                this.isEmpty = true;
+                this.count = 0;
+                this.head = null;
+            }
+
+            public void CopyTo(Array array, int index)
+            {
+                throw new NotImplementedException();
+            } //TODO
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return new DynamicStack<T>.Enumerator(this);
+            }
+
+            public T Peek()
+            {
+                if (this.head == null)
+                    throw new StackEmptyException("The stack is empty !");
+                return this.head.Value;
+            }
+
+            public T Pop()
+            {
+                if (this.head == null)
+                    throw new StackUnderflowException("The stack is already empty !");
+
+                StackNode node = this.head;
+                this.head = this.head.PreviousNode;
+
+                this.count--;
+                this.version++;
+
+                return node.Value;
+            }
+
+            public void Push(T item)
+            {
+                if (this.head == null)
+                {
+                    this.head = new StackNode(item, null);
+                }
+                else
+                {
+                    StackNode node = new StackNode(item, this.head);
+                    this.head = node;
+                }
+
+                this.count++;
+                this.version++;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return new DynamicStack<T>.Enumerator(this);
+            }
+            #endregion
+        }
     }
 
     /// <summary>
@@ -733,6 +1181,11 @@ namespace Chapter_16_Linear_Data_Structures
         {
 
         }
+
+        public class Deque<T>
+        {
+
+        }
     }
 
     /// <summary>
@@ -743,6 +1196,11 @@ namespace Chapter_16_Linear_Data_Structures
     public static class Exo14
     {
         public static void Execute()
+        {
+
+        }
+
+        public class CircularQueue<T>
         {
 
         }
