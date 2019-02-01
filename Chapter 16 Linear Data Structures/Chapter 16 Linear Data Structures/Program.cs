@@ -1179,12 +1179,229 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
-
+            Queue<int> d = new Queue<int>();
         }
 
-        public class Deque<T>
+        public class EmptyCollectionException : SystemException
         {
+            public EmptyCollectionException() : base() { }
+            public EmptyCollectionException(string message) : base(message) { }
+        }
 
+        public interface IDeque<T>
+        {
+            #region Fields
+            bool IsEmpty { get; }
+            int Count { get; }
+            #endregion
+
+            #region Methods
+            void PushBack(T item);
+            void PushFront(T item);
+            T PopBack();
+            T PopFront();
+            T PeekBack();
+            T PeekFront();
+            void Clear();
+            #endregion
+        }
+
+        public class Deque<T> : IDeque<T>, ICollection<T>, IEnumerable<T>
+        {
+            #region Classes
+            private class DequeNode
+            {
+                #region Fields
+                private T item = default(T);
+                private DequeNode previousNode = null;
+                private DequeNode nextNode = null;
+                #endregion
+
+                #region Constructors
+                public DequeNode() : this(default(T))
+                {
+
+                }
+                public DequeNode(T item, DequeNode previousNode = null, DequeNode nextNode = null)
+                {
+                    this.item = item;
+                    this.previousNode = previousNode;
+                    this.nextNode = nextNode;
+                }
+                #endregion
+
+                #region Properties
+                public T Item { get { return this.item; } set { this.item = value; } }
+                public DequeNode PreviousNode { get { return this.previousNode; } set { this.previousNode = value; } }
+                public DequeNode NextNode { get { return this.nextNode; } set { this.nextNode = value; } }
+                #endregion
+            }
+            #endregion
+
+            #region Fields
+            private bool isReadOnly = false;
+            private bool isEmpty = true;
+
+            private int count = 0;
+            private int version = 0;
+
+            private DequeNode backNode = null;
+            private DequeNode frontNode = null;
+            #endregion
+
+            #region Constructors
+            public Deque()
+            {
+                this.count = 0;
+                this.version = 0;
+                this.isEmpty = true;
+                this.backNode = null;
+                this.frontNode = null;
+            }
+            #endregion
+
+            #region Properties
+            public bool IsEmpty { get { return this.isEmpty; } }
+
+            public int Count { get { return this.count; } }
+
+            public bool IsReadOnly { get { return this.isReadOnly; } }
+            #endregion
+
+            public void Add(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Clear()
+            {
+                this.count = 0;
+                this.version++;
+                this.isEmpty = true;
+                this.backNode = null;
+                this.frontNode = null;
+            }
+
+            public bool Contains(T item) //TODO
+            {
+                if (this.isEmpty)
+                    return false;
+                return true;
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            #region IDeque
+            public T PeekBack()
+            {
+                if (this.isEmpty)
+                    throw new EmptyCollectionException("Deque is empty !");
+
+                return this.backNode.Item;
+            }
+
+            public T PeekFront()
+            {
+                if (this.isEmpty)
+                    throw new EmptyCollectionException("Deque is empty !");
+
+                return this.frontNode.Item;
+            }
+
+            public T PopBack()
+            {
+                if (this.isEmpty)
+                    throw new EmptyCollectionException("Deque is empty !");
+
+                T item = this.backNode.Item;
+                this.RemoveNode(this.backNode);
+                return item;
+            }
+
+            public T PopFront()
+            {
+                if (this.isEmpty)
+                    throw new EmptyCollectionException("Deque is empty !");
+
+                T item = this.frontNode.Item;
+                this.RemoveNode(this.frontNode);
+                return item;
+            }
+
+            public void PushBack(T item)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void PushFront(T item)
+            {
+                throw new NotImplementedException();
+            }
+            #endregion
+
+            private void PushBackNode(DequeNode node)
+            {
+
+            }
+            private void PushFrontNode(DequeNode node)
+            {
+
+            }
+            private void AddNodeBefore(DequeNode node, DequeNode previousNode)
+            {
+
+            }
+            private void AddNodeAfter(DequeNode node, DequeNode nextNode)
+            {
+
+            }
+            private void RemoveNode(DequeNode node)
+            {
+                if(this.count == 1)
+                {
+                    this.isEmpty = true;
+                    this.backNode = null;
+                    this.frontNode = null;
+                }
+                else
+                {
+                    if(node == this.backNode)
+                    {
+                        //Remove Back Node
+                    }
+                    else if(node == this.frontNode)
+                    {
+                        //Remove Front Node
+                    }
+                    else
+                    {
+                        //Remove Node
+                    }
+                }
+
+                this.count--;
+                this.version++;
+            }
+
+            public bool Remove(T item) //TODO
+            {
+                if (this.isEmpty)
+                    return false;
+                return true;
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 
