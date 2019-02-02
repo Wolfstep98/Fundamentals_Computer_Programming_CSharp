@@ -528,9 +528,9 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
-            
-        }
 
+        }
+        //TODO : Better Inserts/Adds/Remove functions => errors when back or front operation call
         public class DoublyLinkedList<T> : ICollection<T>, IEnumerable<T>, IList<T>, IReadOnlyCollection<T>, IReadOnlyList<T>, IEnumerable//, ICollection, IList
         {
             #region Classes
@@ -1236,6 +1236,88 @@ namespace Chapter_16_Linear_Data_Structures
                 public DequeNode NextNode { get { return this.nextNode; } set { this.nextNode = value; } }
                 #endregion
             }
+
+            public class Enumerator : IEnumerator<T>, IEnumerator
+            {
+                #region Fields
+                private int version = 0;
+                private T current = default(T);
+
+                private DequeNode currentNode = null;
+                private Deque<T> deque = null;
+                #endregion
+
+                #region Constructors
+                public Enumerator(Deque<T> deque)
+                {
+                    this.version = deque.version;
+                    this.current = default(T);
+                    this.currentNode = deque.backNode;
+                    this.deque = deque;
+                }
+                #endregion
+
+                #region Properties
+                public T Current
+                {
+                    get
+                    {
+                        if (this.version != deque.version)
+                        {
+                            throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                        }
+                        return this.current;
+                    }
+                }
+
+                object IEnumerator.Current
+                {
+                    get
+                    {
+                        if (this.version != deque.version)
+                        {
+                            throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                        }
+                        return this.current;
+                    }
+                }
+                #endregion
+
+                #region Methods
+                public void Dispose()
+                {
+                    this.current = default(T);
+                    this.currentNode = null;
+                }
+
+                public bool MoveNext()
+                {
+                    if(this.version != deque.version)
+                    {
+                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    }
+                    if (this.currentNode == null)
+                    {
+                        this.current = default(T);
+                        return false;
+                    }
+
+                    this.current = this.currentNode.Item;
+                    this.currentNode = this.currentNode.NextNode;
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    if (this.version != deque.version)
+                    {
+                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    }
+                    this.current = default(T);
+                    this.currentNode = deque.backNode;
+                }
+                #endregion
+            }
             #endregion
 
             #region Fields
@@ -1268,9 +1350,10 @@ namespace Chapter_16_Linear_Data_Structures
             public bool IsReadOnly { get { return this.isReadOnly; } }
             #endregion
 
+            #region Methods
             public void Add(T item)
             {
-                throw new NotImplementedException();
+                this.PushFront(item);
             }
 
             public void Clear()
@@ -1282,13 +1365,25 @@ namespace Chapter_16_Linear_Data_Structures
                 this.frontNode = null;
             }
 
-            public bool Contains(T item) //TODO
+            public bool Contains(T item)
             {
                 if (this.isEmpty)
                     return false;
-                return true;
+
+                DequeNode currentNode = this.backNode;
+                while (currentNode != null)
+                {
+                    if (object.Equals(currentNode.Item, item))
+                    {
+                        return true;
+                    }
+                    currentNode = currentNode.NextNode;
+                }
+
+                return false;
             }
 
+            //TODO
             public void CopyTo(T[] array, int arrayIndex)
             {
                 throw new NotImplementedException();
@@ -1296,7 +1391,7 @@ namespace Chapter_16_Linear_Data_Structures
 
             public IEnumerator<T> GetEnumerator()
             {
-                throw new NotImplementedException();
+                return new Enumerator(this);
             }
 
             #region IDeque
@@ -1338,31 +1433,98 @@ namespace Chapter_16_Linear_Data_Structures
 
             public void PushBack(T item)
             {
-                throw new NotImplementedException();
+                DequeNode node = new DequeNode(item);
+                this.PushBackNode(node);
             }
 
             public void PushFront(T item)
             {
-                throw new NotImplementedException();
+                DequeNode node = new DequeNode(item);
+                this.PushFrontNode(node);
             }
             #endregion
 
+            // --- Add Functions ---
             private void PushBackNode(DequeNode node)
             {
+                if (this.backNode == null)
+                {
+                    this.frontNode = node;
+                    this.backNode = node;
 
+                    this.isEmpty = false;
+                    this.version++;
+                    this.count++;
+                }
+                else
+                {
+                    this.backNode.PreviousNode = node;
+                    node.NextNode = this.backNode;
+                    this.backNode = node;
+
+                    this.version++;
+                    this.count++;
+                }
             }
             private void PushFrontNode(DequeNode node)
             {
+                if(this.frontNode == null)
+                {
+                    this.frontNode = node;
+                    this.backNode = node;
 
+                    this.isEmpty = false;
+                    this.version++;
+                    this.count++;
+                }
+                else
+                {
+                    this.frontNode.NextNode = node;
+                    node.PreviousNode = this.frontNode;
+                    this.frontNode = node;
+
+                    this.version++;
+                    this.count++;
+                }
             }
-            private void AddNodeBefore(DequeNode node, DequeNode previousNode)
+            private void AddNodeBefore(DequeNode node, DequeNode futurNextNode)
             {
+                if(futurNextNode == this.backNode)
+                {
+                    this.PushBackNode(node);
+                }
+                else
+                {
+                    DequeNode previousNode = futurNextNode.PreviousNode;
+                    node.PreviousNode = previousNode;
+                    node.NextNode = futurNextNode;
+                    futurNextNode.PreviousNode = node;
+                    previousNode.NextNode = node;
 
+                    this.version++;
+                    this.count++;
+                }
             }
-            private void AddNodeAfter(DequeNode node, DequeNode nextNode)
+            private void AddNodeAfter(DequeNode node, DequeNode futurPreviousNode)
             {
+                if (futurPreviousNode == this.frontNode)
+                {
+                    this.PushFrontNode(node);
+                }
+                else
+                {
+                    DequeNode nextNode = futurPreviousNode.NextNode;
+                    node.PreviousNode = futurPreviousNode;
+                    node.NextNode = nextNode;
+                    futurPreviousNode.NextNode = node;
+                    nextNode.PreviousNode = node;
 
+                    this.version++;
+                    this.count++;
+                }
             }
+
+            // --- Remove Functions ---
             private void RemoveNode(DequeNode node)
             {
                 if(this.count == 1)
@@ -1376,32 +1538,52 @@ namespace Chapter_16_Linear_Data_Structures
                     if(node == this.backNode)
                     {
                         //Remove Back Node
+                        DequeNode nextBackNode = this.backNode.NextNode;
+                        this.backNode = nextBackNode;
                     }
                     else if(node == this.frontNode)
                     {
                         //Remove Front Node
+                        DequeNode nextFrontNode = this.frontNode.PreviousNode;
+                        this.frontNode = nextFrontNode;
                     }
                     else
                     {
                         //Remove Node
+                        DequeNode nextNode = node.NextNode;
+                        DequeNode previousNode = node.PreviousNode;
+                        previousNode.NextNode = nextNode;
+                        nextNode.PreviousNode = previousNode;
                     }
                 }
 
                 this.count--;
                 this.version++;
             }
-
-            public bool Remove(T item) //TODO
+            public bool Remove(T item)
             {
                 if (this.isEmpty)
                     return false;
-                return true;
+
+                DequeNode currentNode = this.backNode;
+                while(currentNode != null)
+                {
+                    if(object.Equals(currentNode.Item, item))
+                    {
+                        this.RemoveNode(currentNode);
+                        return true;
+                    }
+                    currentNode = currentNode.NextNode;
+                }
+
+                return false;
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
-                throw new NotImplementedException();
+                return new Enumerator(this);
             }
+            #endregion
         }
     }
 
