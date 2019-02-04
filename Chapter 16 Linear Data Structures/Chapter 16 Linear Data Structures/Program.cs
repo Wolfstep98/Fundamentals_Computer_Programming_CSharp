@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,9 @@ namespace Chapter_16_Linear_Data_Structures
             //Exo7.Execute();
             //Exo8.Execute();
             //Exo9.Execute();
-            Exo10.Execute();
+            //Exo10.Execute();
+            //Exo16.Execute();
+            Exo17.Execute();
         }
 
         public static void PrintIntegerArray(int[] tab)
@@ -1624,19 +1627,158 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
+            string path = "C:/";
+            BFS(path);
+        }
 
+        public static void BFS(string path)
+        {
+            Queue<string> queue = new Queue<string>();
+            queue.Enqueue(path);
+            DirectoryInfo infoDir = new DirectoryInfo(path);
+            ConsolePading(infoDir.FullName);
+            Console.WriteLine(infoDir.Name);
+
+            while (queue.Count != 0)
+            {
+                string currentDirectory = "";
+                try
+                {
+                    currentDirectory = queue.Dequeue();
+                }
+                catch(InvalidOperationException e)
+                {
+                    Console.WriteLine(e.Message);
+                    return;
+                }
+
+                try
+                {
+                    string[] directory = Directory.GetDirectories(currentDirectory);
+                    for (int i = 0; i < directory.Length; i++)
+                    {
+                        DirectoryInfo infoDirec = new DirectoryInfo(directory[i]);
+                        ConsolePading(infoDirec.FullName);
+                        Console.WriteLine(infoDirec.Name);
+                        queue.Enqueue(directory[i]);
+                    }
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+
+                //try
+                //{
+                //    string[] files = Directory.GetFiles(currentDirectory);
+                //    for (int i = 0; i < files.Length; i++)
+                //    {
+                //        FileInfo info = new FileInfo(files[i]);
+                //        ConsolePading(info.FullName);
+                //        Console.WriteLine(info.Name);
+                //    }
+                //}
+                //catch (IOException e)
+                //{
+                //    Console.WriteLine(e.Message);
+                //}
+                //catch (UnauthorizedAccessException e)
+                //{
+                //    Console.WriteLine(e.Message);
+                //}
+                //catch (ArgumentException e)
+                //{
+                //    Console.WriteLine(e.Message);
+                //}
+            }
+        }
+
+        public static void ConsolePading(string padding)
+        {
+            int depth = 0;
+
+            for(int i = 0; i < padding.Length;i++)
+            {
+                if (padding[i] == '\\')
+                    depth++;
+            }
+
+            for(int i = 0; i < depth; i++)
+            {
+                Console.Write("    ");
+            }
         }
     }
 
     /// <summary>
-    /// Using queue, implement a complete traversal of all directories on your hard disk and print them on the console. 
+    /// Using queue (Stack), implement a complete traversal of all directories on your hard disk and print them on the console. 
     /// Implement the algorithm Depth-First-Search (DFS) – you may find some articles in the internet.
     /// </summary>
     public static class Exo17
     {
         public static void Execute()
         {
+            string path = "D:/";
+            DFS(path);
+        }
 
+        public static void DFS(string path)
+        {
+            Stack<string> stack = new Stack<string>();
+            stack.Push(path);
+
+            string currentDirectory;
+            while (stack.Count != 0)
+            {
+                currentDirectory = stack.Pop();
+                DirectoryInfo info = new DirectoryInfo(currentDirectory);
+                ConsolePading(info.FullName);
+                Console.WriteLine(info.Name);
+                try
+                {
+                    string[] directories = Directory.GetDirectories(currentDirectory);
+                    for (int i = 0; i < directories.Length; i++)
+                    {
+                        stack.Push(directories[i]);
+                    }
+                }
+                catch (IOException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                catch (UnauthorizedAccessException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+                catch (ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+
+        public static void ConsolePading(string padding)
+        {
+            int depth = 0;
+
+            for (int i = 0; i < padding.Length; i++)
+            {
+                if (padding[i] == '\\')
+                    depth++;
+            }
+
+            for (int i = 0; i < depth; i++)
+            {
+                Console.Write("    ");
+            }
         }
     }
 
