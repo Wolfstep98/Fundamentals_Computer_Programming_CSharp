@@ -24,22 +24,22 @@ namespace Chapter_3_Operators_and_Expressions
     {
         static void Main(string[] args)
         {
-            Exo1.Execute();
-            Exo2.Execute();
-            Exo3.Execute();
-            Exo4.Execute();
-            Exo5.Execute();
-            Exo6.Execute();
-            Exo7.Execute();
-            Exo8.Execute();
-            Exo9.Execute();
-            Exo10.Execute();
-            Exo11.Execute();
-            Exo12.Execute();
-            Exo13.Execute();
-            Exo14.Execute();
-            Exo15.Execute();
-            Exo16.Execute();
+            //Exo1.Execute();
+            //Exo2.Execute();
+            //Exo3.Execute();
+            //Exo4.Execute();
+            //Exo5.Execute();
+            //Exo6.Execute();
+            //Exo7.Execute();
+            //Exo8.Execute();
+            //Exo9.Execute();
+            //Exo10.Execute();
+            //Exo11.Execute();
+            //Exo12.Execute();
+            //Exo13.Execute();
+            //Exo14.Execute();
+            //Exo15.Execute();
+            //Exo16.Execute();
         }
     }
 
@@ -51,8 +51,13 @@ namespace Chapter_3_Operators_and_Expressions
         public static void Execute()
         {
             int value = 42;
-            bool isOdd = (value % 2 == 0);
-            Console.WriteLine($"The variable is odd : {isOdd}");
+            bool isOdd = !IsEven(value);
+            Console.WriteLine($"The variable {value} is odd : {isOdd}");
+        }
+
+        public static bool IsEven(int value)
+        {
+            return (value % 2 == 0);
         }
     }
 
@@ -65,20 +70,32 @@ namespace Chapter_3_Operators_and_Expressions
         {
             int value = 42;
             bool isDivisibleBy5Or7 = (value % 5 == 0 && value % 7 == 0);
-            Console.WriteLine($"The variable is divisible by 5 or 7 : {isDivisibleBy5Or7}");
+            Console.WriteLine($"The variable {value} is divisible by 5 or 7 : {isDivisibleBy5Or7}");
         }
     }
 
     /// <summary>
     /// Write an expression that looks for a given integer if its third digit (right to left) is 7.
     /// </summary>
-    public static class Exo3 
+    public static class Exo3
     {
         public static void Execute()
         {
-            
+            Random random = new Random();
+            int number = random.Next(0, 1000);
+            int temp = number / 100;
+            int result = temp % 10;
+            if (result == 7)
+            {
+                Console.WriteLine("Win : " + number);
+            }
+            else
+            {
+                Console.WriteLine("Lose : " + number);
+            }
+
         }
-    } //TODO
+    }
 
     /// <summary>
     /// Write an expression that checks whether the third bit in a given integer is 1 or 0.
@@ -115,8 +132,10 @@ namespace Chapter_3_Operators_and_Expressions
     {
         public static void Execute()
         {
-            float rectWidth = 4f;
-            float rectHeight = 6f;
+            Console.Write("Write the width : ");
+            float rectWidth = float.Parse(Console.ReadLine());
+            Console.Write("Write the height : ");
+            float rectHeight = float.Parse(Console.ReadLine());
             float rectPerimeter = (rectHeight + rectWidth) * 2;
             float rectArea = rectWidth * rectHeight;
             Console.WriteLine($"The rectangle perimeter is : {rectPerimeter}, and the area i : {rectArea}");
@@ -142,7 +161,8 @@ namespace Chapter_3_Operators_and_Expressions
     }
 
     /// <summary>
-    /// Write an expression that checks for a given point {x, y} if it is within the circle K({ 0, 0}, R=5).     /// Explanation: the point {0, 0} is the center of the circle and 5 is the radius.
+    /// Write an expression that checks for a given point {x, y} if it is within the circle K({ 0, 0}, R=5). 
+    /// Explanation: the point {0, 0} is the center of the circle and 5 is the radius.
     /// </summary>
     public static class Exo8
     {

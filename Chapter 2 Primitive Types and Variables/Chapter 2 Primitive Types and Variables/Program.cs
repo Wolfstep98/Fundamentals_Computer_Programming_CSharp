@@ -10,19 +10,19 @@ namespace Chapter_2_Primitive_Types_and_Variables
     {
         static void Main(string[] args)
         {
-            Exo1.Execute();
-            Exo2.Execute();
-            Exo3.Execute();
-            Exo4.Execute();
-            Exo5.Execute();
-            Exo6.Execute();
-            Exo7.Execute();
-            Exo8.Execute();
-            Exo9.Execute();
-            Exo10.Execute();
-            Exo11.Execute();
-            Exo12.Execute();
-            Exo13.Execute();
+            //Exo1.Execute();
+            //Exo2.Execute();
+            //Exo3.Execute();
+            //Exo4.Execute();
+            //Exo5.Execute();
+            //Exo6.Execute();
+            //Exo7.Execute();
+            //Exo8.Execute();
+            //Exo9.Execute();
+            //Exo10.Execute();
+            //Exo11.Execute();
+            //Exo12.Execute();
+            //Exo13.Execute();
         }
     }
 
@@ -34,19 +34,35 @@ namespace Chapter_2_Primitive_Types_and_Variables
     {
         public static void Execute()
         {
-            ushort var1 = 52130;
-            sbyte var2 = -115;
-            int var3 = 4825932;
-            byte var4 = 97;
-            short var5 = -10000;
-            short var6 = 20000;
-            byte var7 = 224;
-            int var8 = 970700000;
-            byte var9 = 112;
-            sbyte var10 = -44;
-            int var11 = -1000000;
-            short var12 = 1990;
-            ulong var13 = 123456789123456789;
+            // Declare variables
+            ushort unsignedShort = 52130;
+            sbyte shortByte = -115;
+            int integer = 4825932;
+            byte _byte = 97;
+            short _short = -10000;
+            short _short1 = 20000;
+            byte _byte1 = 224;
+            int integer1 = 970700000;
+            byte _byte2 = 112;
+            sbyte shortByte1 = -44;
+            int integer2 = -1000000;
+            short _short2 = 1990;
+            ulong unsignedLong = 123456789123456789;
+
+            // Show variables in console
+            Console.WriteLine(unsignedShort.GetType() + " : " + unsignedShort.ToString());
+            Console.WriteLine(shortByte.GetType() + " : " + shortByte.ToString());
+            Console.WriteLine(integer.GetType() + " : " + integer.ToString());
+            Console.WriteLine(_byte.GetType() + " : " + _byte.ToString());
+            Console.WriteLine(_short.GetType() + " : " + _short.ToString());
+            Console.WriteLine(_short1.GetType() + " : " + _short1.ToString());
+            Console.WriteLine(_byte1.GetType() + " : " + _byte1.ToString());
+            Console.WriteLine(integer1.GetType() + " : " + integer1.ToString());
+            Console.WriteLine(_byte2.GetType() + " : " + _byte2.ToString());
+            Console.WriteLine(shortByte1.GetType() + " : " + shortByte1.ToString());
+            Console.WriteLine(integer2.GetType() + " : " + integer2.ToString());
+            Console.WriteLine(_short2.GetType() + " : " + _short2.ToString());
+            Console.WriteLine(unsignedLong.GetType() + " : " + unsignedLong.ToString());
         }
     }
 
@@ -58,12 +74,21 @@ namespace Chapter_2_Primitive_Types_and_Variables
     {
         public static void Execute()
         {
-            float val1 = 5f;
-            float val2 = -5.01f;
-            double val3 = 34.567839023;
-            float val4 = 12.345f;
-            float val5 = 8923.12345857f;
-            decimal val6 = 3456.091124875956542151256683467m;
+            // Declare variables
+            float floatingPointValue = 5f;
+            float floatingPointValue1 = -5.01f;
+            double doubleValue = 34.567839023;
+            float floatingPointValue2 = 12.345f;
+            decimal decimalValue = 823.12345857m;
+            decimal decimalValue1 = 3456.091124875956542151256683467m; // Too big, even for decimal
+           
+            // Show variables
+            Console.WriteLine(floatingPointValue.GetType() + " : " + floatingPointValue.ToString());
+            Console.WriteLine(floatingPointValue1.GetType() + " : " + floatingPointValue1.ToString());
+            Console.WriteLine(doubleValue.GetType() + " : " + doubleValue.ToString());
+            Console.WriteLine(floatingPointValue2.GetType() + " : " + floatingPointValue2.ToString());
+            Console.WriteLine(decimalValue.GetType() + " : " + decimalValue.ToString());
+            Console.WriteLine(decimalValue1.GetType() + " : " + decimalValue1.ToString());
         }
     }
 
@@ -116,6 +141,7 @@ namespace Chapter_2_Primitive_Types_and_Variables
         public static void Execute()
         {
             bool isMale = true;
+            Console.WriteLine("Are you a male ? " + isMale);
         }
     }
 
@@ -150,7 +176,7 @@ namespace Chapter_2_Primitive_Types_and_Variables
             object sentence = hello + " " + world;
             Console.WriteLine(sentence);
 
-            string strSentence = (string)sentence;
+            string strSentence = (string)sentence; // string strSentence = sentence as string;
             Console.WriteLine(strSentence);
         }
     }
@@ -177,13 +203,13 @@ namespace Chapter_2_Primitive_Types_and_Variables
         public static void Execute()
         {
             string oHeart =
-                 "    o        o\n" +
-                 "   o   o    o   o\n" +
-                 "  o      o o      o\n" +
-                 "  o       o      o\n" +
-                 "   o            o\n" +
-                 "     o         o\n" +
-                 "       o      o\n" +
+                 "     o o       o o\n" +
+                 "   o     o   o     o\n" +
+                 "  o       o o       o\n" +
+                 "  o        o       o\n" +
+                 "   o              o\n" +
+                 "     o           o\n" +
+                 "       o       o\n" +
                  "         o   o\n" +
                  "           o \n";
             Console.WriteLine(oHeart);
@@ -197,7 +223,8 @@ namespace Chapter_2_Primitive_Types_and_Variables
     {
         public static void Execute()
         {
-            string triangleIsocele = "    \u00A9\n" +
+            string triangleIsocele = 
+                "    \u00A9\n" +
                 "   \u00A9 \u00A9\n" +
                 "  \u00A9   \u00A9\n" +
                 " \u00A9     \u00A9\n" +
