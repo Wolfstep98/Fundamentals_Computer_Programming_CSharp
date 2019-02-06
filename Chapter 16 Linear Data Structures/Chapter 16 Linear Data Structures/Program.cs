@@ -1599,12 +1599,354 @@ namespace Chapter_16_Linear_Data_Structures
     {
         public static void Execute()
         {
-
+            
         }
 
-        public class CircularQueue<T>
+        public interface IQueue<T> 
         {
+            #region Properties
+            bool IsEmpty { get; }
+            int Count { get; }
+            int Capacity { get; }
+            #endregion
 
+            #region Methods
+            void Enqueue(T item);
+            T Dequeue();
+            T Peek();
+            void Clear();
+            bool Contains(T item);
+            void TrimToSize();
+            #endregion
+        }
+
+        public class QueueEmptyException : SystemException
+        {
+            public QueueEmptyException() : base() { }
+            public QueueEmptyException(string message) : base(message) { }
+        }
+
+        public class CircularQueue<T> : IQueue<T>, ICollection, IEnumerable<T>
+        {
+            #region Nested Class
+            public class Enumerator : IEnumerator<T>, IEnumerator
+            {
+                #region Fields
+                private int version = 0;
+                private int index = 0;
+
+                private T current = default(T);
+
+                private CircularQueue<T> queue = null;
+                #endregion
+
+                #region Constructors
+                public Enumerator(CircularQueue<T> queue)
+                {
+                    this.version = queue.version;
+                    this.index = -1;
+                    this.current = default(T);
+                    this.queue = queue;
+                }
+                #endregion
+
+                #region Properties
+                public T Current
+                {
+                    get
+                    {
+                        if (this.version == this.queue.version)
+                        {
+                            if (this.index == -1)
+                            {
+                                throw new InvalidOperationException("Call MoveNext() first.");
+                            }
+                            else if (this.index == -2)
+                            {
+                                throw new InvalidOperationException("The enumerator reaches the end of the Queue.");
+                            }
+                            return this.current;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                        }
+                    }
+                }
+
+                object IEnumerator.Current { get { return this.Current; } }
+                #endregion
+
+                #region Methods
+                public void Dispose()
+                {
+                    this.index = -2;
+                }
+
+                public bool MoveNext()
+                {
+                    if (this.version != this.queue.version)
+                    {
+                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    }
+
+                    if(this.index == -2)
+                        return false;
+                    if (this.index == -1)
+                        this.index = this.queue.head - 1;
+
+                    this.index++;
+
+                    if (this.index == this.queue.capacity)
+                        this.index = 0;
+
+                    this.current = this.queue.array[this.index];
+
+                    if (this.index == this.queue.tail)
+                        this.index = -2;
+
+                    return true;
+                }
+
+                public void Reset()
+                {
+                    this.index = -1;
+                    this.current = default(T);
+                }
+                #endregion
+            }
+            #endregion
+
+            #region Fields
+            private bool isSynchronized = true;
+
+            private int head = 0;
+            private int tail = 0;
+            private int count = 0;
+            private int capacity = 0;
+            private int version = 0;
+
+            private const int growFactor = 2;
+
+            private const int defaultCapacity = 4;
+
+            private T[] array = null;
+            #endregion
+
+            #region Constructors
+            public CircularQueue()
+            {
+                this.array = new T[defaultCapacity];
+
+                this.head = -1;
+                this.tail = -1;
+                this.count = 0;
+                this.capacity = defaultCapacity;
+                this.version = 0;
+            }
+            public CircularQueue(int capacity)
+            {
+                this.array = new T[capacity];
+
+                this.head = -1;
+                this.tail = -1;
+                this.count = 0;
+                this.capacity = capacity;
+                this.version = 0;
+            }
+            #endregion
+
+            #region Properties
+            /// <summary>
+            /// Is the Queue empty ?
+            /// </summary>
+            public bool IsEmpty { get { return (this.count == 0); } }
+
+            /// <summary>
+            /// Number of elements in the Queue.
+            /// </summary>
+            public int Count { get { return this.count; } }
+
+            public bool IsSynchronized { get { return this.isSynchronized; } }
+
+            public object SyncRoot { get { return this.isSynchronized; } }
+
+            /// <summary>
+            /// Total buffer capacity of the Queue.
+            /// </summary>
+            public int Capacity { get { return this.capacity; } }
+            #endregion
+
+            #region Methods
+            /// <summary>
+            /// Clear the Queue and create a new one with the same size.
+            /// </summary>
+            public void Clear()
+            {
+                this.array = null;
+                this.array = new T[this.capacity];
+
+                this.count = 0;
+                this.version++;
+            }
+
+            /// <summary>
+            /// Is the Queue containing an <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The item we are looking for.</param>
+            /// <returns>True if the item is in the Queue, otherwise false.</returns>
+            public bool Contains(T item)
+            {
+                if(this.count == 0)
+                    return false;
+                if(this.head > this.tail)
+                {
+                    for (int i = this.head; i < this.capacity; i++)
+                    {
+                        if (object.Equals(this.array[i], item))
+                        {
+                            return true;
+                        }
+                    }
+                    for (int i = 0; i < this.tail; i++)
+                    {
+                        if (object.Equals(this.array[i], item))
+                        {
+                            return true;
+                        }
+                    }
+                }
+                else
+                {
+                    for(int i = this.head; i < this.tail;i++)
+                    {
+                        if(object.Equals(this.array[i],item))
+                        {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            public void CopyTo(Array array, int index) //TODO
+            {
+                throw new NotImplementedException();
+            }
+
+            /// <summary>
+            /// Get the element at the head of the Queue and remove it.
+            /// </summary>
+            /// <returns>The element at the head of the Queue.</returns>
+            public T Dequeue()
+            {
+                if(this.count == 0)
+                {
+                    throw new QueueEmptyException("The queue you are trying to access is empty.");
+                }
+
+                T item = this.array[this.head];
+
+                this.version++;
+                this.count--;
+
+                if(this.head != this.tail)
+                {
+                    this.head++;
+                    if (this.head == this.capacity)
+                    {
+                        this.head = 0;
+                    }
+                }
+
+                return item;
+            }
+
+            /// <summary>
+            /// Add the <paramref name="item"/> at the tail of the Queue.
+            /// </summary>
+            /// <param name="item">The item to add to the Queue.</param>
+            public void Enqueue(T item)
+            {
+                if(this.count == this.capacity)
+                {
+                    this.SetCapacity(this.count * growFactor);
+                }
+
+                this.tail++;
+                if(this.tail == this.capacity)
+                {
+                    this.tail = 0;
+                }
+                this.array[this.tail] = item;
+
+                this.version++;
+                this.count++;
+            }
+
+            public IEnumerator GetEnumerator()
+            {
+                return new Enumerator(this);
+            }
+
+            /// <summary>
+            /// Peek the element at the head of the Queue.
+            /// </summary>
+            /// <returns>The element at the head of the Queue.</returns>
+            public T Peek()
+            {
+                if (this.count == 0)
+                {
+                    throw new QueueEmptyException("The queue you are trying to access is empty.");
+                }
+
+                return this.array[this.head];
+            }
+
+            IEnumerator<T> IEnumerable<T>.GetEnumerator()
+            {
+                return new Enumerator(this);
+            }
+
+            /// <summary>
+            /// Create a new buffer to stock elements.
+            /// </summary>
+            /// <param name="capacity">The new capacity.</param>
+            private void SetCapacity(int capacity)
+            {
+                T[] nextArray = new T[capacity];
+
+                if (this.count > 0)
+                {
+                    if (this.head > this.tail)
+                    {
+                        Array.Copy(this.array, this.head, nextArray, 0, this.count - this.head);
+                        Array.Copy(this.array, 0, nextArray, this.count - this.head, this.tail);
+                    }
+                    else
+                    {
+                        Array.Copy(this.array, this.head, nextArray, 0, this.count);
+                    }
+                }
+
+                this.array = nextArray;
+
+                this.head = 0;
+                this.tail = this.count - 1;
+
+                this.version++;
+                this.capacity = capacity;
+            }
+
+            /// <summary>
+            /// Resize the capacity to the current count.
+            /// </summary>
+            public void TrimToSize()
+            {
+                this.SetCapacity(this.count);
+            }
+            #endregion
         }
     }
 

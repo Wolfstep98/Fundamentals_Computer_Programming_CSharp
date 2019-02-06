@@ -85,11 +85,48 @@ namespace Chapter_5_Conditional_Statements
             int value3 = 48;
             int biggestValue = 0;
 
-            biggestValue = value1;
-            if (value2 > biggestValue)
-                biggestValue = value2;
-            if (value3 > biggestValue)
-                biggestValue = value3;
+            if(value1 > value2)
+            {
+                if(value2 > value3)
+                {
+                    biggestValue = value1;
+                }
+                else
+                {
+                    if(value1 > value3)
+                    {
+                        biggestValue = value1;
+                    }
+                    else
+                    {
+                        biggestValue = value3;
+                    }
+                }
+            }
+            else
+            {
+                if(value1 > value3)
+                {
+                    biggestValue = value2;
+                }
+                else
+                {
+                    if (value2 > value3)
+                    {
+                        biggestValue = value2;
+                    }
+                    else
+                    {
+                        biggestValue = value3;
+                    }
+                }
+            }
+
+            //biggestValue = value1;
+            //if (value2 > biggestValue)
+            //    biggestValue = value2;
+            //if (value3 > biggestValue)
+            //    biggestValue = value3;
 
             Console.WriteLine(biggestValue);
         }
@@ -143,7 +180,7 @@ namespace Chapter_5_Conditional_Statements
             switch (number)
             {
                 case -1:
-                    Console.WriteLine("Write an correct integer pls");
+                    Console.WriteLine("Write a correct integer pls");
                     break;
                 case 0:
                     Console.WriteLine("Zero");
@@ -194,7 +231,7 @@ namespace Chapter_5_Conditional_Statements
             float b = 5f;
             float c = 0f;
 
-            float discriminant = (b * b) - (4f * a * c);
+            float discriminant = (b * b) - (4.0f * a * c);
             if (discriminant == 0)
             {
                 float x = -b / (2f * a);

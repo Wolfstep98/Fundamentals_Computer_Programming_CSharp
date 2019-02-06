@@ -6,4 +6,16 @@
     <RootNamespace>Chapter_16_Linear_Data_Structures</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="System">
+      <HintPath>System</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Installer1.cs">
+      <SubType>Component</SubType>
+    </Compile>
+  </ItemGroup>
+
 </Project>
