@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -10,7 +11,7 @@ namespace Chapter_17_Trees_and_Graphs
     /// Tree data structure.
     /// </summary>
     /// <typeparam name="T">Type of the values of the tree.</typeparam>
-    public class Tree<T>
+    public class Tree<T> where T : IComparable, IComparable<T>
     {
         #region Fields
         private TreeNode<T> root = null;
@@ -36,13 +37,84 @@ namespace Chapter_17_Trees_and_Graphs
         public bool isEmpty { get { return this.root == null; } }
         public TreeNode<T> Root { get { return this.root; } }
         #endregion
+
+        #region Methods
+        public int FindOcurrencesOfValue(T value)
+        {
+            int result = 0;
+            result = FindOccurencesInNodesDFS(this.root, value);
+            return result;
+        }
+        private int FindOccurencesInNodesDFS(TreeNode<T> node, T value)
+        {
+            int result = 0;
+
+            if (node.Value.CompareTo(value) == 0)
+                result = 1;
+
+            foreach(TreeNode<T> child in node.Childs)
+            {
+                result += FindOccurencesInNodesDFS(child, value);
+            }
+            return result;
+        }
+
+        // --- DFS ---
+        public void PrintDFS()
+        {
+            this.TraversalPrintDFS(this.root, "");
+        }
+
+        private void TraversalPrintDFS(TreeNode<T> node, string indentation)
+        {
+            foreach (TreeNode<T> child in node.Childs)
+            {
+                TraversalPrintDFS(child, indentation + "    ");
+            }
+
+            //Print Node value
+            Console.WriteLine(indentation + node.Value.ToString());
+        }
+
+        // --- BFS ---
+        public void PrintBFS()
+        {
+            this.TraversalPrintBFS(this.root);
+        }
+
+        private void TraversalPrintBFS(TreeNode<T> root)
+        {
+            string indentation = "";
+            Stack<TreeNode<T>> stack = new Stack<TreeNode<T>>();
+            Stack<string> indentations = new Stack<string>();
+            stack.Push(root);
+            indentations.Push(indentation);
+
+            while(stack.Count != 0)
+            {
+                TreeNode<T> node = stack.Pop();
+                indentation = indentations.Pop();
+                if (node.ChildrenCount != 0)
+                {
+                    foreach (TreeNode<T> child in node.Childs)
+                    {
+                        stack.Push(child);
+                        indentations.Push(indentation + "    ");
+                    }
+                }
+
+                Console.WriteLine(indentation + node.Value);
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>
     /// Tree node for the tree data structure.
     /// </summary>
     /// <typeparam name="T">Type of value contained in the node.</typeparam>
-    public class TreeNode<T>
+    public class TreeNode<T> where T : IComparable, IComparable<T>
     {
         #region Fields
         private bool hasParent = false;
@@ -68,6 +140,7 @@ namespace Chapter_17_Trees_and_Graphs
         #region Properties
         public T Value { get { return this.value; } }
         public int ChildrenCount { get { return this.childs.Count; } }
+        public TreeNode<T>[] Childs { get { return this.childs.ToArray(); } }
         #endregion
 
         #region Methods
@@ -108,11 +181,13 @@ namespace Chapter_17_Trees_and_Graphs
     }
     #endregion
 
+
     public class Program
     {
         static void Main(string[] args)
         {
-            
+            //Exo1.Execute();
+            Exo2.Execute();
         }
     }
 
@@ -123,7 +198,37 @@ namespace Chapter_17_Trees_and_Graphs
     {
         public static void Execute()
         {
+            Random random = new Random();
             
+Tree<int> integerTree = 
+                new Tree<int>(random.Next(0, 10),
+                    new Tree<int>(random.Next(0, 10),
+                        new Tree<int>(random.Next(0, 10)),
+                        new Tree<int>(random.Next(0, 10)),
+                        new Tree<int>(random.Next(0, 10)),
+                        new Tree<int>(random.Next(0, 10))),
+                    new Tree<int>(random.Next(0, 10),
+                        new Tree<int>(random.Next(0, 10),
+                            new Tree<int>(random.Next(0, 10)))));
+
+            //integerTree.PrintDFS();
+            integerTree.PrintBFS();
+
+            int number = random.Next(0, 10);
+            int occurences = integerTree.FindOcurrencesOfValue(number);
+
+            Console.WriteLine(number + " occurs " + occurences + " times in the tree !");
+        }
+    }
+
+    /// <summary>
+    /// Write a program that displays the roots of those sub-trees of a tree, which have exactly k nodes, where k is an integer.
+    /// </summary>
+    public static class Exo2
+    {
+        public static void Execute()
+        {
+
         }
     }
 }
