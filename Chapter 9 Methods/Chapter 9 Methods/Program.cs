@@ -7,24 +7,25 @@ namespace Chapter_9_Methods
     {
         static void Main(string[] args)
         {
-            Exo1.Execute();
-            Exo2.Execute();
-            Exo3.Execute();
-            Exo4.Execute();
-            Exo5.Execute();
-            Exo6.Execute();
-            Exo7.Execute();
-            Exo8.Execute();
-            Exo9.Execute();
-            Exo10.Execute();
-            Exo11.Execute();
-            Exo12.Execute();
+            //Exo1.Execute();
+            //Exo2.Execute();
+            //Exo3.Execute();
+            //Exo4.Execute();
+            //Exo5.Execute();
+            //Exo6.Execute();
+            //Exo7.Execute();
+            //Exo8.Execute();
+            //Exo9.Execute();
+            //Exo10.Execute();
+            //Exo11.Execute();
+            //Exo12.Execute();
             Exo13.Execute();
         }
     }
 
     /// <summary>
-    /// Write a code that by given name prints on the console "Hello, <name>!" (for example: "Hello, Peter!").
+    /// Write a code that by given name prints on the console "Hello, <name>!". 
+    /// Example: "Hello, Peter!".
     /// </summary>
     public static class Exo1
     {
@@ -35,6 +36,10 @@ namespace Chapter_9_Methods
             PrintName(name);
         }
 
+        /// <summary>
+        /// Print <paramref name="name"/> on console.
+        /// </summary>
+        /// <param name="name">Name.</param>
         static void PrintName(string name)
         {
             Console.WriteLine("Hello, {0}!", name);
@@ -55,11 +60,13 @@ namespace Chapter_9_Methods
             int number1 = int.Parse(Console.ReadLine());
             int number2 = int.Parse(Console.ReadLine());
             int number3 = int.Parse(Console.ReadLine());
-
+            
+            //int result = Math.Max(Math.Max(number1, number2), number3);
             int biggestNumber = GetMax(GetMax(number1, number2), number3);
             Console.WriteLine($"The biggest number is {biggestNumber}");
         }
 
+        // Return larger value between a and b.
         static int GetMax(int a, int b)
         {
             return (a > b) ? a : b;
