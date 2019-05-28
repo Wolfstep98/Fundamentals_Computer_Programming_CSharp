@@ -351,7 +351,8 @@ namespace Chapter_15_Text_Files
         public static void Execute()
         {
             StreamReader reader = File.OpenText("FileExo11.txt");
-            StreamWriter writer = File.CreateText("FileExo11WithoutToken.txt");
+            string tempPath = Path.Combine(Path.GetTempPath(), "FileExo11WithoutToken.txt");
+            StreamWriter writer = File.CreateText(tempPath);
             StringBuilder buffer = new StringBuilder(100);
             using (reader)
             {
@@ -361,14 +362,16 @@ namespace Chapter_15_Text_Files
                     while (line != null)
                     {
                         // Parse line
-                        writer.Write(RemovesTokensFromString(line));
+                        writer.Write(StringUtilities.RemoveTokenFromString(line, Token));
+                        //writer.Write(RemovesTokensFromString(line));
                         writer.WriteLine();
                         line = reader.ReadLine();
                     }
                 }
             }
+            
             File.Delete("FileExo11.txt");
-            File.Move("FileExo11WithoutToken.txt", "FileExo11.txt");
+            File.Move(tempPath, "FileExo11.txt");
         }
 
         public static string RemovesTokensFromString(string buffer)
@@ -385,7 +388,7 @@ namespace Chapter_15_Text_Files
                     int nextChar = index + Token.Length;
                     if (nextChar < buffer.Length)
                     {
-                        if(buffer[nextChar] == ' ')
+                        if(buffer[nextChar] == ' ') // Pas bon, la ça marche pour le début d'un mot et encore
                         {
                             index += Token.Length;
                             startIndex = index;
