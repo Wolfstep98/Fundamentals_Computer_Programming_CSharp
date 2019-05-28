@@ -31,10 +31,14 @@ namespace Chapter_17_Trees_and_Graphs
                 this.root.AddChild(tree.root);
             }
         }
+        public Tree(TreeNode<T> node)
+        {
+            this.root = node ?? throw new NullReferenceException();
+        }
         #endregion
 
         #region Properties
-        public bool isEmpty { get { return this.root == null; } }
+        public bool IsEmpty { get { return this.root == null; } }
         public TreeNode<T> Root { get { return this.root; } }
         #endregion
 
@@ -59,6 +63,70 @@ namespace Chapter_17_Trees_and_Graphs
             return result;
         }
 
+        public Tree<T>[] GetSubTreesRootWithNChildsNodes(int childsNodesNumber)
+        {
+            int result = 0;
+            List<Tree<T>> subTreesWithNChildsNodes = new List<Tree<T>>();
+            Stack<TreeNode<T>> nodesLeft = new Stack<TreeNode<T>>();
+            nodesLeft.Push(this.root);
+            while(nodesLeft.Count != 0)
+            {
+                TreeNode<T> currentNode = nodesLeft.Pop();
+                result = this.HasChildsNumber(currentNode, childsNodesNumber);
+                if(result == -1)
+                {
+                    //Not enough childs in sub-trees, so we continue on siblings.
+                    continue;
+                }
+                else if(result == 1)
+                {
+                    foreach(TreeNode<T> child in currentNode.Childs)
+                    {
+                        nodesLeft.Push(child);
+                    }
+                }
+                else
+                {
+                    subTreesWithNChildsNodes.Add(new Tree<T>(currentNode));
+                }
+            }
+
+            return subTreesWithNChildsNodes.ToArray();
+        }
+
+        private int HasChildsNumber(TreeNode<T> node, int childsNumber)
+        {
+            int childs = 0;
+            Stack<TreeNode<T>> nodesLeft = new Stack<TreeNode<T>>();
+            nodesLeft.Push(node);
+            while(childs <= childsNumber && nodesLeft.Count != 0)
+            {
+                TreeNode<T> currentNode = nodesLeft.Pop();
+                childs += currentNode.ChildrenCount;
+                foreach(TreeNode<T> child in currentNode.Childs)
+                {
+                    nodesLeft.Push(child);
+                }
+            }
+
+
+            if (childs < childsNumber)
+            {
+                Console.WriteLine("Node " + node.Value + " has " + childs + " childs in total.");
+                return -1;
+            }
+            else if (childs > childsNumber)
+            {
+                Console.WriteLine("Node " + node.Value + " has more than " + childs + " childs in total.");
+                return 1;
+            }
+            else
+            {
+                Console.WriteLine("Node " + node.Value + " has exactly " + childs + " childs in total.");
+                return 0;
+            }
+        }
+
         // --- DFS ---
         public void PrintDFS()
         {
@@ -74,6 +142,15 @@ namespace Chapter_17_Trees_and_Graphs
 
             //Print Node value
             Console.WriteLine(indentation + node.Value.ToString());
+        }
+
+        private void TraversalDFS(TreeNode<T> node, Action<TreeNode<T>> callback)
+        {
+            callback?.Invoke(node);
+            foreach(TreeNode<T> child in node.Childs)
+            {
+                this.TraversalDFS(child, callback);
+            }
         }
 
         // --- BFS ---
@@ -200,16 +277,16 @@ namespace Chapter_17_Trees_and_Graphs
         {
             Random random = new Random();
             
-Tree<int> integerTree = 
-                new Tree<int>(random.Next(0, 10),
-                    new Tree<int>(random.Next(0, 10),
-                        new Tree<int>(random.Next(0, 10)),
-                        new Tree<int>(random.Next(0, 10)),
-                        new Tree<int>(random.Next(0, 10)),
-                        new Tree<int>(random.Next(0, 10))),
-                    new Tree<int>(random.Next(0, 10),
-                        new Tree<int>(random.Next(0, 10),
-                            new Tree<int>(random.Next(0, 10)))));
+            Tree<int> integerTree = 
+                            new Tree<int>(random.Next(0, 10),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10))),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10),
+                                        new Tree<int>(random.Next(0, 10)))));
 
             //integerTree.PrintDFS();
             integerTree.PrintBFS();
@@ -228,7 +305,37 @@ Tree<int> integerTree =
     {
         public static void Execute()
         {
+            Random random = new Random();
 
+            Tree<int> integerTree =
+                            new Tree<int>(random.Next(0, 10),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10))),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10),
+                                        new Tree<int>(random.Next(0, 10)))));
+
+            //integerTree.PrintDFS();
+            integerTree.PrintBFS();
+
+            Console.Write("Display the roots of the sub-trees which have exactly k nodes where k = ");
+            int k = int.Parse(Console.ReadLine());
+
+            Tree<int>[] subTrees = integerTree.GetSubTreesRootWithNChildsNodes(k);
+            if(subTrees != null && subTrees.Length != 0)
+            {
+                foreach(Tree<int> subTree in subTrees)
+                {
+                    Console.WriteLine("Root node : " + subTree.Root.Value.ToString());
+                }
+            }
+            else
+            {
+                Console.WriteLine("Couldn't find a root node with " + k + " child nodes in total.");
+            }
         }
     }
 }

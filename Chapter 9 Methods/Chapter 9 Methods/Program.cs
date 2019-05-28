@@ -31,7 +31,7 @@ namespace Chapter_9_Methods
     {
         public static void Execute()
         {
-            Console.Write("What is your name ? ");
+            Console.Write("What's your name ? ");
             string name = Console.ReadLine();
             PrintName(name);
         }
@@ -40,7 +40,7 @@ namespace Chapter_9_Methods
         /// Print <paramref name="name"/> on console.
         /// </summary>
         /// <param name="name">Name.</param>
-        static void PrintName(string name)
+        private static void PrintName(string name)
         {
             Console.WriteLine("Hello, {0}!", name);
         }
@@ -60,9 +60,9 @@ namespace Chapter_9_Methods
             int number1 = int.Parse(Console.ReadLine());
             int number2 = int.Parse(Console.ReadLine());
             int number3 = int.Parse(Console.ReadLine());
-            
+
             //int result = Math.Max(Math.Max(number1, number2), number3);
-            int biggestNumber = GetMax(GetMax(number1, number2), number3);
+            int biggestNumber = GetMax(number1, number2, number3);
             Console.WriteLine($"The biggest number is {biggestNumber}");
         }
 
@@ -70,6 +70,12 @@ namespace Chapter_9_Methods
         static int GetMax(int a, int b)
         {
             return (a > b) ? a : b;
+        }
+
+        // Return larger value between a, b and c.
+        static int GetMax(int a, int b, int c)
+        {
+            return GetMax(GetMax(a, b), c);
         }
     }
 

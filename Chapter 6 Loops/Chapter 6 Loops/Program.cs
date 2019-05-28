@@ -9,24 +9,24 @@ namespace Chapter_6_Loops
     {
         static void Main(string[] args)
         {
-            Exo1.Execute();
-            Exo2.Execute();
-            Exo3.Execute();
+            //Exo1.Execute();
+            //Exo2.Execute();
+            //Exo3.Execute();
             Exo4.Execute();
-            Exo5.Execute();
-            Exo6.Execute();
-            Exo7.Execute();
-            Exo8.Execute();
-            Exo9.Execute();
-            Exo10.Execute();
-            Exo11.Execute();
-            Exo12.Execute();
-            Exo13.Execute();
-            Exo14.Execute();
-            Exo15.Execute();
-            Exo16.Execute();
-            Exo17.Execute();
-            Exo18.Execute();
+            //Exo5.Execute();
+            //Exo6.Execute();
+            //Exo7.Execute();
+            //Exo8.Execute();
+            //Exo9.Execute();
+            //Exo10.Execute();
+            //Exo11.Execute();
+            //Exo12.Execute();
+            //Exo13.Execute();
+            //Exo14.Execute();
+            //Exo15.Execute();
+            //Exo16.Execute();
+            //Exo17.Execute();
+            //Exo18.Execute();
         }
 
         public static BigInteger Factorial(int n)
@@ -61,7 +61,19 @@ namespace Chapter_6_Loops
         public static void Execute()
         {
             Console.Write("Write an integer n = ");
-            int n = int.Parse(Console.ReadLine());
+            int n = 0;
+            if(int.TryParse(Console.ReadLine(),out n))
+            {
+                PrintIntFrom1ToN(n);
+            }
+        }
+
+        /// <summary>
+        /// Print all integers from 1 to <paramref name="n"/>.
+        /// </summary>
+        /// <param name="n">The limit for the loop.</param>
+        private static void PrintIntFrom1ToN(int n)
+        {
             for (int i = 1; i <= n; i++)
             {
                 Console.WriteLine(i);
@@ -78,10 +90,23 @@ namespace Chapter_6_Loops
         public static void Execute()
         {
             Console.Write("Write an integer n = ");
-            int n = int.Parse(Console.ReadLine());
+            int n = 0;
+            if (int.TryParse(Console.ReadLine(), out n))
+            {
+                PrintIntDivisibleBy3And7From1ToN(n);
+            }
+        }
+
+        /// <summary>
+        /// Print all the integers that's divisible by 3 and 7 from 1 to <paramref name="n"/>.
+        /// </summary>
+        /// <param name="n">The limit for the loop.</param>
+        private static void PrintIntDivisibleBy3And7From1ToN(int n)
+        {
+            int modulo = 3 * 7;
             for (int i = 1; i <= n; i++)
             {
-                if (i % (3 * 7) != 0)
+                if (i % modulo == 0)
                     Console.WriteLine(i);
             }
         }
@@ -95,13 +120,16 @@ namespace Chapter_6_Loops
         public static void Execute()
         {
             int[] numbers = new int[20];
+            Console.WriteLine("Write 20 integers : ");
             for (int i = 0; i < numbers.Length; i++)
             {
                 bool nextIteration = true;
                 do
                 {
+                    Console.WriteLine("Numbers : "+ i + " / 20");
                     Console.Write("Write an integer : ");
                     nextIteration = !int.TryParse(Console.ReadLine(), out numbers[i]);
+                    Console.Clear();
                 } while (nextIteration);
             }
             IEnumerable<int> query = numbers.OrderBy((number) => number);
@@ -566,5 +594,5 @@ namespace Chapter_6_Loops
 
             }
         }
-    } //TODO
+    } //TODO, Already done in another chapter
 }
