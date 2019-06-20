@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Text;
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 
 namespace Chapter_17_Trees_and_Graphs
 {
-
     #region Class
+
+    // --- Tree Template ---
     /// <summary>
     /// Tree data structure.
     /// </summary>
@@ -184,6 +186,17 @@ namespace Chapter_17_Trees_and_Graphs
             }
         }
 
+        // --- Leaves ---
+        public int GetNumberOfLeaves()
+        {
+            if (this.root == null)
+                throw new MissingFieldException("Root is missing !");
+            return this.root.GetLeaves();
+        }
+        public int GetNumberOfNodes()
+        {
+            return this.root.GetChildsNodeNumber();
+        }
         #endregion
     }
 
@@ -254,17 +267,163 @@ namespace Chapter_17_Trees_and_Graphs
 
             return this.childs[index];
         }
+
+        public int GetLeaves()
+        {
+            if (this.childs.Count == 0)
+                return 1;
+            else
+            {
+                int leaves = 0;
+                foreach(TreeNode<T> child in this.childs)
+                {
+                    leaves += child.GetLeaves();
+                }
+                return leaves;
+            }
+        }
+
+        public int GetChildsNodeNumber()
+        {
+            if (this.childs.Count == 0)
+                return 1;
+            else
+            {
+                int childNodes = 0;
+                foreach(TreeNode<T> child in this.childs)
+                {
+                    childNodes += child.GetChildsNodeNumber();
+                }
+                return childNodes + 1;
+            }
+        }
+        #endregion
+    }
+
+    // --- Binary Tree Template ---
+    public class BinaryTree<T>
+    {
+        #region Fields
+        private T value;
+        private BinaryTree<T> leftChild;
+        private BinaryTree<T> rightChild;
+        #endregion
+
+        #region Constructors
+        public BinaryTree(T value) : this(value, null, null)
+        {
+            
+        }
+        public BinaryTree(T value, BinaryTree<T> leftChild, BinaryTree<T> rightChild)
+        {
+            this.value = value;
+            this.leftChild = leftChild;
+            this.rightChild = rightChild;
+        }
+        #endregion
+
+        #region Properties
+        public T Value { get { return this.value; } }
+        public BinaryTree<T> LeftChild { get { return this.leftChild; } }
+        public BinaryTree<T> RightChild { get { return this.rightChild; } }
+        #endregion
+
+        #region Methods
+        public int GetDepthsSums()
+        {
+            int maxDepth = this.GetMaxDepth();
+            int[] depthsSums = new int[maxDepth];
+            
+            int nodeLeft = 1;
+            int depth = 0;
+            int sum = 0;
+            string currentIndentation = "";
+            Queue<BinaryTree<T>> queue = new Queue<BinaryTree<T>>(10);
+            queue.Enqueue(this);
+
+            while(queue.Count != 0)
+            {
+                BinaryTree<T> currentTree = queue.Dequeue();
+                nodeLeft--;
+                //sum += currentTree.value;
+
+                if (currentTree.leftChild != null)
+                    queue.Enqueue(currentTree.leftChild);
+                if (currentTree.rightChild != null)
+                    queue.Enqueue(currentTree.rightChild);
+
+                if(nodeLeft == 0)
+                {
+                    depth++;
+                    nodeLeft = queue.Count;
+                    currentIndentation += "    ";
+                }
+            }
+            throw new NotImplementedException();
+        }
+        public int GetMaxDepth()
+        {
+            int result = 1;
+
+            if(this.leftChild != null && this.rightChild != null)
+            {
+                int leftDepth = this.leftChild.GetMaxDepth();
+                int rightDepth = this.rightChild.GetMaxDepth();
+                result = Math.Max(leftDepth, rightDepth) + 1;
+            }
+            else if(this.leftChild != null && this.rightChild == null)
+            {
+                result = this.leftChild.GetMaxDepth() + 1;
+            }
+            else if(this.rightChild != null && this.leftChild == null)
+            {
+                result = this.rightChild.GetMaxDepth() + 1;
+            }
+
+            return result;
+        }
+
+        // --- Depth First Search : Left First / Right Second ---
+        public void PrintTreeDFS(string indentation)
+        {
+            Console.WriteLine(indentation + this.value);
+            if (this.leftChild != null)
+                this.leftChild.PrintTreeDFS(indentation + " ");
+            if (this.rightChild != null)
+                this.rightChild.PrintTreeDFS(indentation + " ");
+        }
+
+        // --- Breadth-first search : Left First / Right Second ---
+        public void PrintTreeBFS()
+        {
+            Queue<BinaryTree<T>> queue = new Queue<BinaryTree<T>>(10);
+            queue.Enqueue(this);
+
+            while(queue.Count != 0)
+            {
+                BinaryTree<T> currentTree = queue.Dequeue();
+                Console.WriteLine(currentTree.value);
+                if (currentTree.leftChild != null)
+                    queue.Enqueue(currentTree.leftChild);
+                if (currentTree.rightChild != null)
+                    queue.Enqueue(currentTree.rightChild);
+            }
+        }
         #endregion
     }
     #endregion
-
 
     public class Program
     {
         static void Main(string[] args)
         {
             //Exo1.Execute();
-            Exo2.Execute();
+            //Exo2.Execute();
+            //Exo3.Execute();
+            //Exo4.Execute();
+
+            //Exo11.Execute();
+            Exo12.Execute();
         }
     }
 
@@ -338,4 +497,403 @@ namespace Chapter_17_Trees_and_Graphs
             }
         }
     }
+
+    /// <summary>
+    /// Write a program that finds the number of leaves and number of internal vertices of a tree.
+    /// </summary>
+    public static class Exo3
+    {
+        public static void Execute()
+        {
+            Random random = new Random();
+
+            Tree<int> integerTree =
+                            new Tree<int>(random.Next(0, 10),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10)),
+                                    new Tree<int>(random.Next(0, 10))),
+                                new Tree<int>(random.Next(0, 10),
+                                    new Tree<int>(random.Next(0, 10),
+                                        new Tree<int>(random.Next(0, 10)))));
+
+            //integerTree.PrintDFS();
+            integerTree.PrintBFS();
+
+            int leaves = integerTree.GetNumberOfLeaves();
+            Console.WriteLine("The tree has : " + leaves + " leave(s).");
+
+            int nodes = integerTree.GetNumberOfNodes();
+            Console.WriteLine("The tree has : " + nodes + " node(s).");
+        }
+    }
+
+    /// <summary>
+    /// Write a program that finds in a binary tree of numbers the sum of the vertices of each level of the tree.
+    /// </summary>
+    public static class Exo4
+    {
+        public static int[] GetBinaryTreeDepthsSum(BinaryTree<int> binaryTree)
+        {
+            int maxDepth = binaryTree.GetMaxDepth();
+            int[] depthsSums = new int[maxDepth];
+
+            int nodeLeft = 1;
+            int depth = 0;
+            int sum = 0;
+            string currentIndentation = "";
+            Queue<BinaryTree<int>> queue = new Queue<BinaryTree<int>>(10);
+            queue.Enqueue(binaryTree);
+
+            while (queue.Count != 0)
+            {
+                BinaryTree<int> currentTree = queue.Dequeue();
+                nodeLeft--;
+                sum += currentTree.Value;
+
+                Console.WriteLine(currentIndentation + currentTree.Value);
+
+                if (currentTree.LeftChild != null)
+                    queue.Enqueue(currentTree.LeftChild);
+                if (currentTree.RightChild != null)
+                    queue.Enqueue(currentTree.RightChild);
+
+                if (nodeLeft == 0)
+                {
+                    depthsSums[depth] = sum;
+                    sum = 0;
+                    depth++;
+                    nodeLeft = queue.Count;
+                    currentIndentation += "    ";
+                }
+            }
+            return depthsSums;
+        }
+
+        public static void Execute()
+        {
+            BinaryTree<int> binaryIntegerTree = new BinaryTree<int>(1,
+                new BinaryTree<int>(10,
+                    new BinaryTree<int>(5,
+                        new BinaryTree<int>(8, null, null),
+                        new BinaryTree<int>(6, null, null)),
+                    new BinaryTree<int>(4,
+                        new BinaryTree<int>(6, null, null),
+                        null)),
+                new BinaryTree<int>(5,
+                    new BinaryTree<int>(5,
+                        new BinaryTree<int>(8,
+                            new BinaryTree<int>(8, null, null),
+                            null),
+                        new BinaryTree<int>(4, null,
+                            new BinaryTree<int>(7, null, null))),
+                    new BinaryTree<int>(4,
+                        new BinaryTree<int>(6,
+                            new BinaryTree<int>(2, null,
+                                new BinaryTree<int>(5,null,null)),
+                            new BinaryTree<int>(3,null,null)),
+                        null)));
+
+            binaryIntegerTree.PrintTreeDFS("");
+            Console.WriteLine();
+            //binaryIntegerTree.PrintTreeBFS();
+
+            int[] depthsSum = GetBinaryTreeDepthsSum(binaryIntegerTree);
+
+            for (int i = 0; i < depthsSum.Length; i++)
+            {
+                Console.WriteLine("Depth : " + i + " | Sum : " + depthsSum[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Write a program that finds and prints all vertices of a binary tree, which have for only leaves successors. ???
+    /// Don't understand the question. ("which have for only leaves successors" ????)
+    /// Already done BFS and DFS on BinaryTree<T> class.
+    /// </summary>
+    public static class Exo5
+    {
+        public static void Execute()
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// Write a program that checks whether a binary tree is perfectly balanced.
+    /// </summary>
+    public static class Exo6
+    {
+        public static void Execute()
+        {
+
+        }
+    }
+
+    /// <summary>
+    /// Write a program that searches the directory C:\Windows\ and all its subdirectories recursively and prints all the files which have extension *.exe.
+    /// </summary>
+    public static class Exo11
+    {
+        public static readonly string SearchingDirectory = @"C:\Windows\";
+
+        public static void Execute()
+        {
+            TraverseDirectoryForExeFiles(SearchingDirectory);
+        }
+
+        public static void TraverseDirectoryForExeFiles(string directoryPath)
+        {
+            string[] subDirectories = null;
+            try
+            {
+                subDirectories = Directory.GetDirectories(directoryPath);
+            }
+            catch(UnauthorizedAccessException e)
+            {
+                return;
+            }
+
+            foreach (string subDirectoryPath in subDirectories)
+            {
+                TraverseDirectoryForExeFiles(subDirectoryPath);
+            }
+
+            foreach(string file in Directory.GetFiles(directoryPath))
+            {
+                string extension = Path.GetExtension(file);
+                if (extension.Equals(".exe"))
+                {
+                    Console.WriteLine(file);
+                }
+            }
+        }
+    }
+
+
+    /// <summary>
+    /// Define classes File {string name, int size} and Folder {string name, File[] files, Folder[] childFolders } . 
+    /// Using these classes, build a tree that contains all files and directories on your hard disk, starting from C:\Windows\. 
+    /// Write a method that calculates the sum of the sizes of files in a sub-tree and a program that tests this method.
+    /// To crawl the directories use recursively crawl depth (DFS).
+    /// </summary>
+    public static class Exo12
+    {
+        public static readonly string SearchingDirectory = @"C:\Windows\";
+
+        public static void Execute()
+        {
+            FileSystem.Folder folder = CreateHierarchy(SearchingDirectory);
+            Console.WriteLine("Hierarchy created !");
+
+            for(int i = 0; i < folder.Folders.Length; i++)
+            {
+                FileSystem.Folder currentFolder = folder.Folders[i];
+                if (currentFolder != null)
+                {
+                    long size = currentFolder.GetFilesSize();
+                    int files = currentFolder.GetFileNumber();
+                    int folders = currentFolder.GetFolderNumber();
+                    Console.WriteLine(currentFolder.Name + " size : " + size);
+                    Console.WriteLine(folders + " Folders");
+                    Console.WriteLine(files + " Files");
+                    Console.WriteLine("--- + ---");
+                }
+            }
+        }
+
+        public static FileSystem.Folder CreateHierarchy(string rootPath)
+        {
+            string[] subDirectories = null;
+            FileSystem.Folder[] subFolders = null;
+            try
+            {
+                subDirectories = Directory.GetDirectories(rootPath);
+                subFolders = new FileSystem.Folder[subDirectories.Length];
+                for(int i = 0; i < subDirectories.Length; i++)
+                {
+                    subFolders[i] = CreateHierarchy(subDirectories[i]);
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                return null;
+            }
+
+            string[] filePaths = null;
+            FileSystem.File[] files = null;
+            try
+            {
+                filePaths = Directory.GetFiles(rootPath);
+                files = new FileSystem.File[filePaths.Length];
+                for(int i = 0; i < filePaths.Length; i++)
+                {
+                    FileInfo currentFile = new FileInfo(filePaths[i]);
+                    if (currentFile.Exists)
+                    {
+                        files[i] = new FileSystem.File(currentFile.Name, (int)currentFile.Length);
+                    }
+                    else
+                    {
+                        files[i] = null;
+                    }
+                }
+            }
+            catch (UnauthorizedAccessException e)
+            {
+                
+            }
+
+            FileSystem.Folder folder = new FileSystem.Folder(rootPath, files, subFolders);
+
+            return folder;
+        }
+    }
+
+    namespace FileSystem
+    {
+        /// <summary>
+        /// Base class for a file in the file system.
+        /// </summary>
+        public class File
+        {
+            #region Fields
+            private string name = "";
+            private int size = 0;
+            #endregion
+
+            #region Constructor
+            public File(string name, int size)
+            {
+                this.name = name;
+                this.size = size;
+            }
+            #endregion
+
+            #region Properties
+            public string Name { get { return this.name; } }
+            public int Size { get { return this.size; } }
+            #endregion
+        }
+
+        /// <summary>
+        /// Base class for a folder in the file system.
+        /// A folder contains subfolders.
+        /// A folder contains files.
+        /// </summary>
+        public class Folder
+        {
+            #region Fields
+            private const int MinimumFilesBufferSize = 4;
+            private const int MinimumSubFoldersBufferSize = 4;
+
+            private string name = "";
+            private File[] files = null;
+            private Folder[] childFolders = null;
+            #endregion
+
+            #region Constructors
+            public Folder(string name, File[] files = null, Folder[] subFolders = null)
+            {
+                this.name = name;
+                this.files = files;
+                this.childFolders = subFolders;
+            }
+            #endregion
+
+            #region Properties
+            public string Name { get { return this.name; } }
+            public File[] Files { get { return this.files; } }
+            public Folder[] Folders { get { return this.childFolders; } }
+            #endregion
+
+            #region Methods
+            #region Files
+            public void AddFile(File file)
+            {
+                if (file == null)
+                    throw new ArgumentNullException("[Argument Null Exception] - The parameter file is null ref.");
+            }
+            public void AddFiles(params File[] files)
+            {
+                if (files == null)
+                    throw new ArgumentNullException("[Argument Null Exception] - The parameter files is null ref.");
+            }
+
+            private void AddFileToFolder(File file)
+            {
+                if(this.files == null)
+                {
+                    this.files = new File[MinimumFilesBufferSize];
+                }
+            }
+            #endregion
+            #region Folders
+            public long GetFilesSize()
+            {
+                long size = 0;
+
+                if (this.childFolders != null)
+                {
+                    for (int i = 0; i < this.childFolders.Length; i++)
+                    {
+                        if(this.childFolders[i] != null)
+                            size += this.childFolders[i].GetFilesSize();
+                    }
+                }
+
+                if(this.files != null)
+                {
+                    for(int i = 0; i < this.files.Length; i++)
+                    {
+                        if (this.files[i] != null)
+                            size += this.files[i].Size;
+                    }
+                }
+
+                return size;
+            }
+            public int GetFolderNumber()
+            {
+                int folderNumber = this.childFolders?.Length ?? 0;
+
+                if (this.childFolders != null)
+                {
+                    for (int i = 0; i < this.childFolders.Length; i++)
+                    {
+                        if (this.childFolders[i] != null)
+                            folderNumber += this.childFolders[i].GetFolderNumber();
+                    }
+                }
+
+                return folderNumber;
+            }
+            public int GetFileNumber()
+            {
+                int fileNumber = this.files?.Length ?? 0;
+
+                if (this.childFolders != null)
+                {
+                    for (int i = 0; i < this.childFolders.Length; i++)
+                    {
+                        if (this.childFolders[i] != null)
+                            fileNumber += this.childFolders[i].GetFileNumber();
+                    }
+                }
+
+                return fileNumber;
+            }
+            #endregion
+            #endregion
+        }
+    }
+
+    public static class Exo13
+    {
+
+    }
+
+
 }

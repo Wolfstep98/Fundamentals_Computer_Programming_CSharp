@@ -9,7 +9,7 @@ namespace Chapter_15_Text_Files
     {
         static void Main(string[] args)
         {
-            Exo11.Execute();
+            Exo12.Execute();
         }
     }
 
@@ -427,11 +427,57 @@ namespace Chapter_15_Text_Files
     /// </summary>
     public static class Exo12
     {
+        static string[] tokens = null;
+
         public static void Execute()
         {
+            // Read all words from the file and stock them into an array.
+            StreamReader tokensReader = File.OpenText("words.txt");
+            using (tokensReader)
+            {
+                List<string> tempTokens = new List<string>();
+                string line = tokensReader.ReadLine();
+                while(line != null)
+                {
+                    tempTokens.Add(line);
 
+                    line = tokensReader.ReadLine();
+                }
+                tokens = tempTokens.ToArray();
+            }
+
+            // Parse file and remove words
+            StreamReader reader = File.OpenText("FileExo12.txt");
+            string tempPath = Path.Combine(Path.GetTempPath(), "FileExo12WithoutTokens.txt");
+            StreamWriter writer = File.CreateText(tempPath);
+            StringBuilder buffer = new StringBuilder(100);
+            using (reader)
+            {
+                using (writer)
+                {
+                    string line = reader.ReadLine();
+                    while (line != null)
+                    {
+                        // Parse line
+                        int tokenIndex = 0;
+                        string parsedLine = line;
+                        while (tokenIndex < tokens.Length)
+                        {
+                            parsedLine = StringUtilities.RemoveTokenFromString(parsedLine, tokens[tokenIndex],StringFindOption.WholeWord);
+                            tokenIndex++;
+                        }
+                        writer.Write(parsedLine);
+                        //writer.Write(RemovesTokensFromString(line));
+                        writer.WriteLine();
+                        line = reader.ReadLine();
+                    }
+                }
+            }
+
+            File.Delete("FileExo12.txt");
+            File.Move(tempPath, "FileExo12.txt");
         }
-    } //TODO
+    } 
 
     /// <summary>
     /// Write a program that reads a list of words from a file called words.txt, counts how many times each of these words is found in another file text.txt, and records the results in a third file – result.txt, 

@@ -30,7 +30,25 @@ namespace Chapter_15_Text_Files
             char[] temp = null;
             StringBuilder tempBuffer = new StringBuilder(100);
             //Regex
-            string pattern = @"\b(" + word + @")/b";
+            string pattern = "";
+            switch (option)
+            {
+                case StringFindOption.BeginningOfAWord:
+                    pattern = word + @"\b";
+                    break;
+                case StringFindOption.EndOfAWord:
+                    pattern = @"\b" + word;
+                    break;
+                case StringFindOption.WholeWord:
+                    pattern = @"\b" + word + @"\b";
+                    break;
+                case StringFindOption.Part:
+                    pattern = @"([[:<:]]" + word + @"[[:>:]])";
+                    break;
+                default:
+                    pattern = @"\b(" + word + @")\b";
+                    break;
+            }
             Regex regex = new Regex(pattern);
             string result = Regex.Replace(sentence, pattern, "");
             return result;
